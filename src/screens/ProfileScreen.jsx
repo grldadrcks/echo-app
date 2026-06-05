@@ -11,6 +11,9 @@ const DIM_LABELS = {
   mortalityStyle:    { label: 'MORTALITY',  map: { legacy: 'Legacy-Driven', present: 'Present-Focused', avoidant: 'Guarded' } },
   conflictStyle:     { label: 'CONFLICT',   map: { direct: 'Direct', diplomatic: 'Diplomatic', avoidant: 'Avoidant' } },
   timeOrientation:   { label: 'TIME',       map: { past: 'Past', present: 'Present', future: 'Future' } },
+  identityCore:      { label: 'IDENTITY',   map: { achiever: 'Achiever', relational: 'Relational', experiential: 'Experiential' } },
+  agencyStyle:       { label: 'AGENCY',     map: { internal: 'Internal', contextual: 'Contextual', collective: 'Collective' } },
+  desireCore:        { label: 'DESIRE',     map: { security: 'Security', connection: 'Connection', growth: 'Growth' } },
 }
 
 function RadarChart({ profile, size = 220 }) {
@@ -357,7 +360,7 @@ export default function ProfileScreen() {
         {showRestart && (
           <div className="animate-fade-in space-y-3">
             <p className="text-slate-600 text-xs leading-relaxed mono text-center px-2">
-              This is a record of how your mind moved through seven layers. It is not a judgment. It is a map — and maps are only useful when you know you're the one holding them.
+              This is a record of how your mind moved through {REALMS.length} layers. It is not a judgment. It is a map — and maps are only useful when you know you're the one holding them.
             </p>
             <button onClick={handleDescend} className="btn-realm mono tracking-widest uppercase text-sm">
               DESCEND TO CYCLE {cycleCount + 2}

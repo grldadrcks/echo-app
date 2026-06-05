@@ -92,6 +92,36 @@ export const REALMS = [
     debriefSub: 'Past, present, or future — your center of gravity shapes how you move.',
   },
   {
+    id: 'identity',
+    label: 'IDENTITY',
+    accent: '#0e7490',
+    accentRgb: '14,116,144',
+    intro: 'You have a story about who you are.',
+    introSub: 'This stratum asks where that story comes from.',
+    debrief: 'Your self-concept has been mapped.',
+    debriefSub: 'Where you locate yourself — in achievement, in others, or in your own inner life — shapes everything.',
+  },
+  {
+    id: 'agency',
+    label: 'AGENCY',
+    accent: '#15803d',
+    accentRgb: '21,128,61',
+    intro: 'Something happens. You respond.',
+    introSub: 'This stratum asks who you believe is the author.',
+    debrief: 'Your relationship to causation has been recorded.',
+    debriefSub: 'Whether you see yourself as author, navigator, or participant shapes every decision you make.',
+  },
+  {
+    id: 'desire',
+    label: 'DESIRE',
+    accent: '#86198f',
+    accentRgb: '134,25,143',
+    intro: 'Beneath every choice is a want.',
+    introSub: 'This stratum finds the one that runs deepest.',
+    debrief: 'What you are ultimately seeking has been noted.',
+    debriefSub: 'Security, connection, or growth — the deepest desire shapes everything above it.',
+  },
+  {
     id: 'detachment',
     label: 'DETACHMENT',
     accent: '#e2e8f0',
@@ -120,6 +150,9 @@ const INITIAL_STATE = {
     mortality:   { answers: [] },
     conflict:    { answers: [] },
     time:        { answers: [] },
+    identity:    { answers: [] },
+    agency:      { answers: [] },
+    desire:      { answers: [] },
     detachment:  { finalChoice: null },
   },
   profile: null,
@@ -136,6 +169,9 @@ function freshTracking() {
     mortality:   { answers: [] },
     conflict:    { answers: [] },
     time:        { answers: [] },
+    identity:    { answers: [] },
+    agency:      { answers: [] },
+    desire:      { answers: [] },
     detachment:  { finalChoice: null },
   }
 }
@@ -184,9 +220,12 @@ function computeProfile(tracking) {
   const mortalityStyle   = plurality(tracking.mortality.answers,  ['legacy', 'present', 'avoidant'])
   const conflictStyle    = plurality(tracking.conflict.answers,   ['direct', 'diplomatic', 'avoidant'])
   const timeOrientation  = plurality(tracking.time.answers,       ['past', 'present', 'future'])
+  const identityCore     = plurality(tracking.identity.answers,   ['achiever', 'relational', 'experiential'])
+  const agencyStyle      = plurality(tracking.agency.answers,     ['internal', 'contextual', 'collective'])
+  const desireCore       = plurality(tracking.desire.answers,     ['security', 'connection', 'growth'])
   const finalChoice      = tracking.detachment.finalChoice || 'questioning'
 
-  return { mindType, valueSystem, attention, biasAwareness, socialOrientation, attachmentCore, mortalityStyle, conflictStyle, timeOrientation, finalChoice }
+  return { mindType, valueSystem, attention, biasAwareness, socialOrientation, attachmentCore, mortalityStyle, conflictStyle, timeOrientation, identityCore, agencyStyle, desireCore, finalChoice }
 }
 
 const ATTACHMENT_NARRATIVE = {
@@ -278,6 +317,30 @@ export function generateNarrative(profile) {
         future:  'You live ahead of yourself. The present is a means of getting somewhere — and you already know roughly where.',
       }[profile.timeOrientation],
     },
+    {
+      label: 'Identity',
+      text: {
+        achiever:     'You locate yourself in what you build and accomplish. You are your work — and that is not emptiness, it is direction.',
+        relational:   'You know yourself through others. The people you love are not external to who you are — they are constitutive of it.',
+        experiential: 'You find yourself in the interior. Your inner life — how you feel, what you sense, who you are beneath the surface — is your truest reference point.',
+      }[profile.identityCore],
+    },
+    {
+      label: 'Agency',
+      text: {
+        internal:   'You hold yourself as the primary author of your outcomes. Ownership and initiative come naturally — so does the weight of self-blame.',
+        contextual:  'You understand that conditions shape outcomes as much as choices do. That clarity protects you from certain illusions.',
+        collective:  'You believe agency is distributed. Outcomes emerge from relationships and alignment, not from individual will alone.',
+      }[profile.agencyStyle],
+    },
+    {
+      label: 'Desire',
+      text: {
+        security:   'What you most fundamentally want is a life that does not feel precarious. Safety is not a small thing — it is the ground everything else is built on.',
+        connection: 'What you most fundamentally want is to be truly known and to truly know others. That depth of belonging is the thing you keep reaching for.',
+        growth:     'What you most fundamentally want is to keep becoming. Stagnation is your version of death — forward motion is what makes life feel real.',
+      }[profile.desireCore],
+    },
   ]
 }
 
@@ -359,6 +422,34 @@ export function generateSynthesis(profile) {
       when: p => p.finalChoice === 'acceptance' && p.biasAwareness === 'high',
       text: "You accepted the profile and moved when shown the mechanism — twice. You have a habit of letting evidence update you. That's harder than it sounds.",
     },
+    {
+      when: p => p.identityCore === 'achiever' && p.mortalityStyle === 'legacy',
+      text: "You define yourself by what you build, and you orient toward what outlasts you. That's not ego — it's a coherent philosophy. The risk is confusing the work with the self.",
+    },
+    {
+      when: p => p.identityCore === 'relational' && p.desireCore === 'connection',
+      text: "You know yourself through others and most deeply want to be truly known. That's a consistent inner logic — and a vulnerability. Your wellbeing is held in other people's hands more than most.",
+    },
+    {
+      when: p => p.identityCore === 'experiential' && p.timeOrientation === 'present',
+      text: "You locate yourself in your inner life and live in the present. That's a rare combination — it suggests a genuine interiority rather than distraction.",
+    },
+    {
+      when: p => p.agencyStyle === 'internal' && p.conflictStyle === 'direct',
+      text: "You hold yourself as the author of outcomes and move through friction rather than around it. That produces results — and sometimes leaves little room for what you can't control.",
+    },
+    {
+      when: p => p.agencyStyle === 'collective' && p.socialOrientation === 'adaptive',
+      text: "You believe outcomes emerge through relationships and you calibrate to the group without being captured by it. That combination is quietly powerful.",
+    },
+    {
+      when: p => p.desireCore === 'security' && p.mortalityStyle === 'avoidant',
+      text: "You want a life that feels safe, and you hold the limit at arm's length. Those two things reinforce each other. The cost is that neither fear nor drive gets fully examined.",
+    },
+    {
+      when: p => p.desireCore === 'growth' && p.timeOrientation === 'future',
+      text: "You are reaching toward something and living ahead of yourself. The present is almost always a means to what comes next. That drive is real — so is the risk of arriving somewhere you forgot to inhabit.",
+    },
   ]
   return combos.filter(c => c.when(profile)).slice(0, 3)
 }
@@ -373,6 +464,8 @@ const ARCHETYPES = [
       { fn: p => p.socialOrientation === 'independent', weight: 2 },
       { fn: p => p.attention === 'focused', weight: 2 },
       { fn: p => p.conflictStyle === 'direct', weight: 1 },
+      { fn: p => p.identityCore === 'achiever', weight: 1 },
+      { fn: p => p.agencyStyle === 'internal', weight: 1 },
     ],
     portrait: 'You build systems before you build anything else. The framework matters as much as what it holds. You think in structures — and the most important structure you maintain is your own consistency.',
     shadow: 'The map can become more real than the territory. You may resist what doesn\'t fit the system, even when it should.',
@@ -387,6 +480,8 @@ const ARCHETYPES = [
       { fn: p => p.conflictStyle === 'direct', weight: 3 },
       { fn: p => p.biasAwareness === 'low', weight: 1 },
       { fn: p => p.socialOrientation === 'independent', weight: 1 },
+      { fn: p => p.agencyStyle === 'internal', weight: 1 },
+      { fn: p => p.desireCore === 'security', weight: 1 },
     ],
     portrait: 'You see things as they are and move accordingly. Not cynical — accurate. You optimize because you understand the cost of not optimizing, and you\'ve paid it before.',
     shadow: 'What can\'t be measured can still matter enormously. The unmeasurable tends to get underweighted in your calculations.',
@@ -400,6 +495,7 @@ const ARCHETYPES = [
       { fn: p => p.valueSystem === 'contextual', weight: 3 },
       { fn: p => p.socialOrientation === 'adaptive', weight: 3 },
       { fn: p => p.conflictStyle === 'diplomatic', weight: 2 },
+      { fn: p => p.agencyStyle === 'contextual', weight: 1 },
     ],
     portrait: 'You read situations the way a sailor reads water — constantly adjusting. You hold multiple frameworks at once and apply them selectively. You find the third option others didn\'t see.',
     shadow: 'Without fixed principles, your flexibility can look like inconsistency — or feel like it from the inside.',
@@ -428,6 +524,8 @@ const ARCHETYPES = [
       { fn: p => p.timeOrientation === 'future', weight: 2 },
       { fn: p => p.finalChoice === 'questioning', weight: 2 },
       { fn: p => p.attention === 'scattered', weight: 1 },
+      { fn: p => p.identityCore === 'experiential', weight: 1 },
+      { fn: p => p.desireCore === 'growth', weight: 1 },
     ],
     portrait: 'You follow the question wherever it leads. You are uncomfortable with closed answers and drawn to the edges of what is known. Arrival feels like loss.',
     shadow: 'Accumulation without integration can leave you rich in experience and thin in rootedness.',
@@ -442,6 +540,8 @@ const ARCHETYPES = [
       { fn: p => p.conflictStyle === 'direct', weight: 3 },
       { fn: p => p.socialOrientation === 'independent', weight: 2 },
       { fn: p => p.biasAwareness === 'low', weight: 1 },
+      { fn: p => p.agencyStyle === 'internal', weight: 1 },
+      { fn: p => p.identityCore === 'achiever', weight: 1 },
     ],
     portrait: 'You move through resistance rather than around it. Confrontation is not something you avoid — it\'s a tool. You create change in situations where others are still waiting for permission.',
     shadow: 'You can leave scorch marks on people who needed gentleness instead of force.',
@@ -456,6 +556,8 @@ const ARCHETYPES = [
       { fn: p => p.conflictStyle === 'diplomatic', weight: 2 },
       { fn: p => p.valueSystem === 'contextual', weight: 2 },
       { fn: p => ['relationships', 'friendship', 'home'].includes(p.attachmentCore), weight: 1 },
+      { fn: p => p.identityCore === 'relational', weight: 1 },
+      { fn: p => p.desireCore === 'connection', weight: 1 },
     ],
     portrait: 'You read rooms and people with unusual precision. You adapt not to disappear into the group but to meet it. You feel the weight of what\'s unsaid in almost every interaction.',
     shadow: 'Your attunement can become self-erasure. The thread of what you actually want can get lost in tracking everyone else.',
@@ -469,6 +571,8 @@ const ARCHETYPES = [
       { fn: p => p.socialOrientation === 'adaptive', weight: 3 },
       { fn: p => p.conflictStyle === 'diplomatic', weight: 3 },
       { fn: p => p.valueSystem === 'contextual', weight: 1 },
+      { fn: p => p.agencyStyle === 'collective', weight: 1 },
+      { fn: p => p.desireCore === 'connection', weight: 1 },
     ],
     portrait: 'You translate between people. You understand multiple positions simultaneously and can articulate each one better than the person who holds it. You build bridges where others only see the gap.',
     shadow: 'You can delay necessary confrontation indefinitely in the name of keeping the peace. Some things need to be broken before they can be fixed.',
@@ -484,6 +588,8 @@ const ARCHETYPES = [
       { fn: p => p.conflictStyle === 'diplomatic', weight: 2 },
       { fn: p => p.mortalityStyle === 'present', weight: 2 },
       { fn: p => ['home', 'relationships', 'promise'].includes(p.attachmentCore), weight: 1 },
+      { fn: p => p.desireCore === 'security', weight: 1 },
+      { fn: p => p.identityCore === 'relational', weight: 1 },
     ],
     portrait: 'You are the person people return to. You provide stability without demanding credit for it. Your reliability is a kind of generosity that goes largely unnoticed — except by those who depend on it.',
     shadow: 'You can carry others\' weight until it becomes resentment. Stability for others can come at the cost of your own becoming.',
@@ -498,6 +604,7 @@ const ARCHETYPES = [
       { fn: p => p.attention === 'focused', weight: 2 },
       { fn: p => p.socialOrientation === 'independent', weight: 2 },
       { fn: p => p.finalChoice === 'acceptance', weight: 1 },
+      { fn: p => p.identityCore === 'experiential', weight: 1 },
     ],
     portrait: 'You observe more than you act, and your observations are precise. You let things reveal themselves rather than forcing the reveal. You are often the most accurate person in the room — and sometimes the quietest.',
     shadow: 'Distance can look like wisdom when it\'s actually protection. Not all observation is detachment; some is avoidance.',
@@ -526,6 +633,8 @@ const ARCHETYPES = [
       { fn: p => p.mortalityStyle === 'present', weight: 2 },
       { fn: p => p.timeOrientation === 'present', weight: 2 },
       { fn: p => p.attention === 'scattered', weight: 2 },
+      { fn: p => p.identityCore === 'experiential', weight: 1 },
+      { fn: p => p.agencyStyle === 'contextual', weight: 1 },
     ],
     portrait: 'You move through the world collecting experience, perspective, and encounter. You are not lost — you have simply not decided to arrive. Each phase feels complete on its own terms.',
     shadow: 'Range without depth can become a pattern of beginning without finishing.',
@@ -543,7 +652,7 @@ export function computeArchetype(profile) {
 
 export function computeCycleMeta(cycleHistory, currentProfile) {
   if (!cycleHistory.length || !currentProfile) return null
-  const dims = ['mindType', 'valueSystem', 'attention', 'biasAwareness', 'socialOrientation', 'attachmentCore', 'mortalityStyle', 'conflictStyle', 'timeOrientation']
+  const dims = ['mindType', 'valueSystem', 'attention', 'biasAwareness', 'socialOrientation', 'attachmentCore', 'mortalityStyle', 'conflictStyle', 'timeOrientation', 'identityCore', 'agencyStyle', 'desireCore']
   const all  = [...cycleHistory.map(h => h.profile), currentProfile]
   return dims.map(dim => {
     const values    = all.map(p => p[dim])
@@ -690,7 +799,7 @@ function gameReducer(state, action) {
         ...state,
         tracking: {
           ...state.tracking,
-          mortality: { answers: [...state.tracking.mortality.answers, action.value] },
+          mortality: { answers: [...state.tracking.mortality.answers, action.answer] },
         },
       }
 
@@ -699,7 +808,7 @@ function gameReducer(state, action) {
         ...state,
         tracking: {
           ...state.tracking,
-          conflict: { answers: [...state.tracking.conflict.answers, action.value] },
+          conflict: { answers: [...state.tracking.conflict.answers, action.answer] },
         },
       }
 
@@ -708,7 +817,34 @@ function gameReducer(state, action) {
         ...state,
         tracking: {
           ...state.tracking,
-          time: { answers: [...state.tracking.time.answers, action.value] },
+          time: { answers: [...state.tracking.time.answers, action.answer] },
+        },
+      }
+
+    case 'TRACK_IDENTITY':
+      return {
+        ...state,
+        tracking: {
+          ...state.tracking,
+          identity: { answers: [...state.tracking.identity.answers, action.answer] },
+        },
+      }
+
+    case 'TRACK_AGENCY':
+      return {
+        ...state,
+        tracking: {
+          ...state.tracking,
+          agency: { answers: [...state.tracking.agency.answers, action.answer] },
+        },
+      }
+
+    case 'TRACK_DESIRE':
+      return {
+        ...state,
+        tracking: {
+          ...state.tracking,
+          desire: { answers: [...state.tracking.desire.answers, action.answer] },
         },
       }
 
@@ -726,7 +862,7 @@ function gameReducer(state, action) {
 }
 
 const GameContext = createContext(null)
-const STORAGE_KEY = 'echo_state_v3'
+const STORAGE_KEY = 'echo_state_v4'
 
 export function GameProvider({ children }) {
   const [state, dispatch] = useReducer(

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
-import { useGame } from '../context/GameContext.jsx'
+import { useGame, REALMS } from '../context/GameContext.jsx'
 
 const BOOT_LINES_FIRST = [
   { text: 'ECHO v1.0.0',                               delay: 0,    dim: false, bold: true },
   { text: 'Initializing behavioral substrate...',      delay: 900,  dim: true  },
-  { text: 'Loading 7 cognitive strata...',             delay: 1800, dim: true  },
+  { text: `Loading ${REALMS.length} cognitive strata...`,             delay: 1800, dim: true  },
   { text: 'Subject profiling: ENABLED',                delay: 2700, dim: false },
   { text: '─────────────────────────────────────',    delay: 3400, dim: true, small: true },
   { text: 'This is not a game.',                       delay: 4200, dim: false },
