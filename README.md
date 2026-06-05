@@ -1,6 +1,6 @@
 # ECHO
 
-**https://github.com/grldadrcks/strata-app**
+**https://github.com/grldadrcks/echo-app**
 
 A 7-realm psychological mind game. You solve it. It studies you.
 
