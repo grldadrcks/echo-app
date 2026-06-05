@@ -1,5 +1,5 @@
 """
-STRATA icon generator.
+ECHO icon generator.
 Design: 7 horizontal white bars on pure black, opacity ascending top→bottom,
 suggesting descent through layers.
 """
@@ -78,7 +78,7 @@ def save(img, folder, filename):
     img.save(path, "PNG")
     print(f"  wrote {os.path.relpath(path, BASE)}")
 
-print("Generating STRATA icons...")
+print("Generating ECHO icons...")
 
 for folder, size in FLAT_SIZES.items():
     icon = make_flat(size)

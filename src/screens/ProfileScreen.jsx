@@ -75,7 +75,7 @@ function ShareCard({ profile }) {
     }}>
       <div className="flex items-center justify-between mb-5">
         <div>
-          <p className="mono text-xs text-slate-600 tracking-widest">STRATA</p>
+          <p className="mono text-xs text-slate-600 tracking-widest">ECHO</p>
           <p className="mono font-bold text-lg tracking-widest" style={{ color: 'var(--realm-accent)' }}>YOUR PATTERN</p>
         </div>
         <RadarChart profile={profile} size={100} />
@@ -98,7 +98,7 @@ function ShareCard({ profile }) {
           {profile.finalChoice === 'acceptance' ? 'Acceptance' : 'Inquiry'}
         </p>
       </div>
-      <p className="mono text-xs text-slate-700 text-center mt-4">strata.mindgame</p>
+      <p className="mono text-xs text-slate-700 text-center mt-4">echo.mindgame</p>
     </div>
   )
 }
@@ -196,9 +196,9 @@ export default function ProfileScreen() {
 
   function handleShare() {
     const text = narrative.map(n => `${n.label}: ${n.text}`).join('\n\n')
-    const full  = `My STRATA pattern (Cycle ${cycleCount + 1}):\n\n${text}\n\nFinal stance: ${profile?.finalChoice}`
+    const full  = `My ECHO pattern (Cycle ${cycleCount + 1}):\n\n${text}\n\nFinal stance: ${profile?.finalChoice}`
     if (navigator.share) {
-      navigator.share({ title: 'STRATA — My Pattern', text: full }).catch(() => {})
+      navigator.share({ title: 'ECHO — My Pattern', text: full }).catch(() => {})
     } else {
       navigator.clipboard.writeText(full).then(() => {
         setCopied(true)
@@ -221,7 +221,7 @@ export default function ProfileScreen() {
           <p className="mono font-bold text-2xl tracking-widest text-white">
             DESCENDING TO CYCLE {cycleCount + 1}
           </p>
-          <p className="mono text-sm text-slate-500">The strata await.</p>
+          <p className="mono text-sm text-slate-500">The echoes await.</p>
           <div className="flex justify-center gap-1.5 mt-6">
             {[0,1,2,3,4,5,6].map(i => (
               <div key={i} className="w-1.5 h-1.5 rounded-full"
@@ -244,7 +244,7 @@ export default function ProfileScreen() {
         {/* Header */}
         <div>
           <p className="mono text-xs text-slate-600 mb-1 tracking-widest">
-            CYCLE {cycleCount + 1} — STRATA COMPLETE
+            CYCLE {cycleCount + 1} — ECHO COMPLETE
           </p>
           <h1 className="mono font-bold text-2xl tracking-widest" style={{ color: 'var(--realm-accent)' }}>
             YOUR PATTERN
@@ -313,7 +313,7 @@ export default function ProfileScreen() {
         {showRestart && (
           <div className="animate-fade-in space-y-3">
             <p className="text-slate-600 text-xs leading-relaxed mono text-center px-2">
-              This is a record of how your mind moved through seven strata. It is not a judgment. It is a map — and maps are only useful when you know you're the one holding them.
+              This is a record of how your mind moved through seven layers. It is not a judgment. It is a map — and maps are only useful when you know you're the one holding them.
             </p>
             <button onClick={handleDescend} className="btn-realm mono tracking-widest uppercase text-sm">
               DESCEND TO CYCLE {cycleCount + 2}

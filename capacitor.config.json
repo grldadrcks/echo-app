@@ -1,6 +1,6 @@
 {
   "appId": "com.strata.mindgame",
-  "appName": "STRATA",
+  "appName": "ECHO",
   "webDir": "dist",
   "server": { "androidScheme": "https" },
   "plugins": {

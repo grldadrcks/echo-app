@@ -12,7 +12,7 @@ const INTRO_VARIANTS = [
   ],
   [
     { text: 'You have returned to this stratum.',                delay: 0    },
-    { text: 'The strata remember you.',                          delay: 1200 },
+    { text: 'The echoes remember you.',                          delay: 1200 },
     { text: 'A second descent reveals what the first obscured.', delay: 2400 },
     { text: 'Your choices this cycle have been recorded.',       delay: 3800 },
     { text: 'Compare what you see now to who you were.',        delay: 5000 },
@@ -23,7 +23,7 @@ const INTRO_VARIANTS = [
     { text: 'You descend because something is still unresolved.',delay: 1000 },
     { text: 'Or because you have changed.',                     delay: 2200 },
     { text: 'Or because you haven\'t.',                         delay: 3200 },
-    { text: 'The strata don\'t judge the reason.',              delay: 4400 },
+    { text: 'The echoes don\'t judge the reason.',              delay: 4400 },
     { text: 'They only record what is true.',                   delay: 5600 },
   ],
 ]
@@ -150,7 +150,7 @@ export default function DetachmentRealm() {
       <div className="space-y-6 animate-fade-in">
         <div className="strata-surface p-5">
           <p className="text-slate-300 text-sm leading-relaxed">
-            You have seen what the strata revealed. What you do with this knowledge is the only thing left that belongs entirely to you.
+            You have seen what the echoes revealed. What you do with this knowledge is the only thing left that belongs entirely to you.
           </p>
         </div>
         <div className="space-y-3">

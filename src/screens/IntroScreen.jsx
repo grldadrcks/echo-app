@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useGame } from '../context/GameContext.jsx'
 
 const BOOT_LINES_FIRST = [
-  { text: 'STRATA v1.0.0',                            delay: 0,    dim: false, bold: true },
+  { text: 'ECHO v1.0.0',                               delay: 0,    dim: false, bold: true },
   { text: 'Initializing behavioral substrate...',      delay: 900,  dim: true  },
   { text: 'Loading 7 cognitive strata...',             delay: 1800, dim: true  },
   { text: 'Subject profiling: ENABLED',                delay: 2700, dim: false },
@@ -14,12 +14,12 @@ const BOOT_LINES_FIRST = [
 ]
 
 const BOOT_LINES_RETURNING = (cycle) => [
-  { text: 'STRATA v1.0.0',                                       delay: 0,    dim: false, bold: true },
+  { text: 'ECHO v1.0.0',                                         delay: 0,    dim: false, bold: true },
   { text: `Cycle ${cycle} complete. Prior data retained.`,        delay: 700,  dim: true  },
   { text: 'Behavioral substrate: reloading...',                   delay: 1500, dim: true  },
   { text: '─────────────────────────────────────',               delay: 2200, dim: true, small: true },
   { text: 'You have descended before.',                           delay: 3000, dim: false },
-  { text: 'The strata remember.',                                 delay: 3900, dim: false },
+  { text: 'The echoes remember.',                                 delay: 3900, dim: false },
   { text: cycle >= 2 ? 'The pattern deepens.' : 'Go deeper.',    delay: 4800, dim: false },
   { text: '─────────────────────────────────────',               delay: 5600, dim: true, small: true },
 ]
@@ -43,7 +43,7 @@ export default function IntroScreen() {
     return () => { timers.forEach(clearTimeout); clearTimeout(btnTimer) }
   }, [cycleCount])
 
-  const btnLabel = isReturning ? `DESCEND TO CYCLE ${cycleCount + 1}` : 'ENTER STRATA'
+  const btnLabel = isReturning ? `DESCEND TO CYCLE ${cycleCount + 1}` : 'ENTER ECHO'
   const subLabel = isReturning
     ? `${cycleHistory.length} cycle${cycleHistory.length !== 1 ? 's' : ''} recorded.`
     : 'Your choices are being recorded.'

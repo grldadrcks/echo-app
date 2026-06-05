@@ -370,7 +370,7 @@ function gameReducer(state, action) {
 }
 
 const GameContext = createContext(null)
-const STORAGE_KEY = 'strata_state_v2'
+const STORAGE_KEY = 'echo_state_v1'
 
 export function GameProvider({ children }) {
   const [state, dispatch] = useReducer(

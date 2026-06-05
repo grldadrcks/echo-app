@@ -1,10 +1,10 @@
-# STRATA
+# ECHO
 
 **https://github.com/grldadrcks/strata-app**
 
 A 7-realm psychological mind game. You solve it. It studies you.
 
-STRATA profiles your behavioral patterns across seven cognitive strata — nature, abstraction, perception, psychology, sociology, attachment, and detachment — then reveals your psychological profile at the end. Every choice is tracked silently.
+ECHO profiles your behavioral patterns across seven cognitive layers — nature, abstraction, perception, psychology, sociology, attachment, and detachment — then reveals your psychological profile at the end. Every choice is tracked silently.
 
 ## Stack
 
