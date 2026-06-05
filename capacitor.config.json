@@ -1,0 +1,12 @@
+{
+  "appId": "com.strata.mindgame",
+  "appName": "STRATA",
+  "webDir": "dist",
+  "server": { "androidScheme": "https" },
+  "plugins": {
+    "StatusBar": {
+      "style": "Dark",
+      "backgroundColor": "#000000"
+    }
+  }
+}
