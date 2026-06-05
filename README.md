@@ -1,16 +1,45 @@
-# React + Vite
+# STRATA
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**https://github.com/grldadrcks/strata-app**
 
-Currently, two official plugins are available:
+A 7-realm psychological mind game. You solve it. It studies you.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+STRATA profiles your behavioral patterns across seven cognitive strata — nature, abstraction, perception, psychology, sociology, attachment, and detachment — then reveals your psychological profile at the end. Every choice is tracked silently.
 
-## React Compiler
+## Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + Vite + Tailwind CSS
+- Capacitor 7 (Android)
+- localStorage persistence
+- No backend, no accounts
 
-## Expanding the ESLint configuration
+## Realms
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| # | Realm | What it measures |
+|---|-------|-----------------|
+| 1 | NATURE | Response speed — intuitive vs analytical |
+| 2 | ABSTRACTION | Ethical reasoning style |
+| 3 | PERCEPTION | Attention focus and framing susceptibility |
+| 4 | PSYCHOLOGY | Cognitive bias awareness |
+| 5 | SOCIOLOGY | Conformity vs independence |
+| 6 | ATTACHMENT | What you hold longest |
+| 7 | DETACHMENT | Acceptance vs questioning |
+
+## Dev
+
+```bash
+npm install
+npm run dev          # Vite dev server
+npm run build        # Production build
+npm run cap:sync     # Sync to Android
+npm run cap:android  # Open in Android Studio
+```
+
+## Android (build APK directly)
+
+```powershell
+cd android
+.\gradlew.bat assembleDebug
+```
+
+Output: `android/app/build/outputs/apk/debug/app-debug.apk`
