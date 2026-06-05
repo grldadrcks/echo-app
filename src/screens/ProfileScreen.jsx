@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useGame, generateNarrative, generateSynthesis, computeCycleMeta, REALMS } from '../context/GameContext.jsx'
+import { useGame, generateNarrative, generateSynthesis, computeCycleMeta, computeArchetype, REALMS } from '../context/GameContext.jsx'
 
 const DIM_LABELS = {
   mindType:          { label: 'MIND TYPE',  map: { intuitive: 'Intuitive', analytical: 'Analytical', balanced: 'Balanced' } },
@@ -8,6 +8,9 @@ const DIM_LABELS = {
   biasAwareness:     { label: 'AWARENESS',  map: { high: 'High', moderate: 'Moderate', low: 'Grounded' } },
   socialOrientation: { label: 'SOCIAL',     map: { independent: 'Independent', conformist: 'Attuned', adaptive: 'Adaptive' } },
   attachmentCore:    { label: 'ATTACHMENT', map: { identity: 'Identity', relationships: 'Connection', beliefs: 'Belief', future: 'Hope', wounds: 'Memory', past_self: 'Past Self', secret: 'Secrets', mentor: 'Mentorship', home: 'Home', promise: 'Promise', hidden_self: 'Hidden Self', ambition: 'Ambition', friendship: 'Friendship', failure: 'Failure', vision: 'Vision', truth: 'Truth' } },
+  mortalityStyle:    { label: 'MORTALITY',  map: { legacy: 'Legacy-Driven', present: 'Present-Focused', avoidant: 'Guarded' } },
+  conflictStyle:     { label: 'CONFLICT',   map: { direct: 'Direct', diplomatic: 'Diplomatic', avoidant: 'Avoidant' } },
+  timeOrientation:   { label: 'TIME',       map: { past: 'Past', present: 'Present', future: 'Future' } },
 }
 
 function RadarChart({ profile, size = 220 }) {
@@ -175,6 +178,7 @@ export default function ProfileScreen() {
   const narrative  = profile ? generateNarrative(profile) : []
   const synthesis  = profile ? generateSynthesis(profile) : []
   const cycleMeta  = computeCycleMeta(cycleHistory, profile)
+  const archetype  = profile ? computeArchetype(profile) : null
 
   useEffect(() => {
     if (!profile) return
@@ -251,6 +255,32 @@ export default function ProfileScreen() {
             YOUR PATTERN
           </h1>
         </div>
+
+        {/* Archetype */}
+        {archetype && (
+          <div className="rounded-2xl p-5 space-y-3"
+            style={{ background: 'rgba(var(--realm-accent-rgb), 0.06)', border: '1px solid rgba(var(--realm-accent-rgb), 0.2)' }}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="mono text-xs text-slate-600 tracking-widest mb-1">YOUR ARCHETYPE</p>
+                <p className="mono font-bold text-xl tracking-widest" style={{ color: 'var(--realm-accent)' }}>
+                  {archetype.name.toUpperCase()}
+                </p>
+              </div>
+            </div>
+            <p className="text-slate-300 text-sm leading-relaxed">{archetype.portrait}</p>
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <p className="mono text-xs text-slate-600 mb-1">GIFT</p>
+                <p className="text-slate-300 text-xs leading-relaxed">{archetype.gift}</p>
+              </div>
+              <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <p className="mono text-xs text-slate-600 mb-1">SHADOW</p>
+                <p className="text-slate-300 text-xs leading-relaxed">{archetype.shadow}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Radar */}
         <div className="flex justify-center">

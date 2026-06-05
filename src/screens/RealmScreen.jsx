@@ -7,6 +7,9 @@ import PerceptionRealm  from '../realms/PerceptionRealm.jsx'
 import PsychologyRealm  from '../realms/PsychologyRealm.jsx'
 import SociologyRealm   from '../realms/SociologyRealm.jsx'
 import AttachmentRealm  from '../realms/AttachmentRealm.jsx'
+import MortalityRealm   from '../realms/MortalityRealm.jsx'
+import ConflictRealm    from '../realms/ConflictRealm.jsx'
+import TimeRealm        from '../realms/TimeRealm.jsx'
 import DetachmentRealm  from '../realms/DetachmentRealm.jsx'
 
 const COMPONENTS = [
@@ -16,6 +19,9 @@ const COMPONENTS = [
   PsychologyRealm,
   SociologyRealm,
   AttachmentRealm,
+  MortalityRealm,
+  ConflictRealm,
+  TimeRealm,
   DetachmentRealm,
 ]
 
@@ -114,7 +120,7 @@ export default function RealmScreen() {
           className="mono text-xs font-medium"
           style={{ color: `rgba(${realm.accentRgb}, 0.55)` }}
         >
-          STRATUM {currentRealm + 1} / 7
+          STRATUM {currentRealm + 1} / {REALMS.length}
         </span>
         <h1
           className="mono font-bold text-2xl tracking-widest mt-0.5"

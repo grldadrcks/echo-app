@@ -62,6 +62,36 @@ export const REALMS = [
     debriefSub: 'The last thing you release is the thing that defines you.',
   },
   {
+    id: 'mortality',
+    label: 'MORTALITY',
+    accent: '#475569',
+    accentRgb: '71,85,105',
+    intro: 'Everything you do happens inside a limit.',
+    introSub: 'This stratum measures what that does to you.',
+    debrief: 'Your relationship with finitude has been recorded.',
+    debriefSub: 'How you hold the limit says everything about how you use what\'s inside it.',
+  },
+  {
+    id: 'conflict',
+    label: 'CONFLICT',
+    accent: '#dc2626',
+    accentRgb: '220,38,38',
+    intro: 'Friction reveals character.',
+    introSub: 'This stratum watches how you move through it.',
+    debrief: 'Your conflict signature has been mapped.',
+    debriefSub: 'How you navigate resistance is the shape of your will.',
+  },
+  {
+    id: 'time',
+    label: 'TIME',
+    accent: '#0891b2',
+    accentRgb: '8,145,178',
+    intro: 'Where you live in time shapes everything else.',
+    introSub: 'This stratum finds your center of gravity.',
+    debrief: 'Your temporal orientation has been recorded.',
+    debriefSub: 'Past, present, or future — your center of gravity shapes how you move.',
+  },
+  {
     id: 'detachment',
     label: 'DETACHMENT',
     accent: '#e2e8f0',
@@ -79,7 +109,7 @@ const INITIAL_STATE = {
   realmPhase: 0,
   pendingRealm: null,
   cycleCount: 0,
-  cycleHistory: [],   // array of { cycle, profile }
+  cycleHistory: [],
   tracking: {
     nature:      { responseTimes: [], rushCount: 0, pauseCount: 0 },
     abstraction: { answers: [] },
@@ -87,6 +117,9 @@ const INITIAL_STATE = {
     psychology:  { biasAnswers: [], postRevealChanges: [] },
     sociology:   { conformCount: 0, resistCount: 0, totalRounds: 6 },
     attachment:  { surrenderOrder: [], finalAnchor: null },
+    mortality:   { answers: [] },
+    conflict:    { answers: [] },
+    time:        { answers: [] },
     detachment:  { finalChoice: null },
   },
   profile: null,
@@ -100,8 +133,17 @@ function freshTracking() {
     psychology:  { biasAnswers: [], postRevealChanges: [] },
     sociology:   { conformCount: 0, resistCount: 0, totalRounds: 6 },
     attachment:  { surrenderOrder: [], finalAnchor: null },
+    mortality:   { answers: [] },
+    conflict:    { answers: [] },
+    time:        { answers: [] },
     detachment:  { finalChoice: null },
   }
+}
+
+function plurality(answers, keys) {
+  const counts = Object.fromEntries(keys.map(k => [k, 0]))
+  answers.forEach(a => { if (counts[a] !== undefined) counts[a]++ })
+  return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0]
 }
 
 function computeProfile(tracking) {
@@ -114,9 +156,7 @@ function computeProfile(tracking) {
   else if (pauseRatio > 0.6) mindType = 'analytical'
   else                       mindType = 'balanced'
 
-  const counts = { utilitarian: 0, principled: 0, contextual: 0 }
-  tracking.abstraction.answers.forEach(a => { if (counts[a] !== undefined) counts[a]++ })
-  const valueSystem = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0]
+  const valueSystem = plurality(tracking.abstraction.answers, ['utilitarian', 'principled', 'contextual'])
 
   const { attentionScore, framingShift, errorFound } = tracking.perception
   const attentionPoints = attentionScore + (errorFound ? 1 : 0) - (framingShift ? 1 : 0)
@@ -140,10 +180,13 @@ function computeProfile(tracking) {
   else if (conformRatio <= 0.33) socialOrientation = 'independent'
   else                           socialOrientation = 'adaptive'
 
-  const attachmentCore = tracking.attachment.finalAnchor || 'identity'
-  const finalChoice    = tracking.detachment.finalChoice  || 'questioning'
+  const attachmentCore   = tracking.attachment.finalAnchor || 'identity'
+  const mortalityStyle   = plurality(tracking.mortality.answers,  ['legacy', 'present', 'avoidant'])
+  const conflictStyle    = plurality(tracking.conflict.answers,   ['direct', 'diplomatic', 'avoidant'])
+  const timeOrientation  = plurality(tracking.time.answers,       ['past', 'present', 'future'])
+  const finalChoice      = tracking.detachment.finalChoice || 'questioning'
 
-  return { mindType, valueSystem, attention, biasAwareness, socialOrientation, attachmentCore, finalChoice }
+  return { mindType, valueSystem, attention, biasAwareness, socialOrientation, attachmentCore, mortalityStyle, conflictStyle, timeOrientation, finalChoice }
 }
 
 const ATTACHMENT_NARRATIVE = {
@@ -211,6 +254,30 @@ export function generateNarrative(profile) {
       label: 'Attachment',
       text: ATTACHMENT_NARRATIVE[profile.attachmentCore] || 'What you held last defines your center.',
     },
+    {
+      label: 'Mortality',
+      text: {
+        legacy:   'You orient toward what outlasts you. Finitude sharpens your sense of what matters — not as fear, but as direction.',
+        present:  'You hold the limit without letting it dominate. You are here, and that is framework enough.',
+        avoidant: 'You hold the knowledge of limits at arm\'s length. Not denial — careful management of what you let into focus.',
+      }[profile.mortalityStyle],
+    },
+    {
+      label: 'Conflict',
+      text: {
+        direct:     'You move toward friction rather than around it. Confrontation is a tool, not a threat.',
+        diplomatic: 'You navigate disagreement with precision. The point isn\'t avoidance — it\'s timing.',
+        avoidant:   'You manage conflict by reducing its surface area. Whether that\'s wisdom or protection depends on what you\'re avoiding.',
+      }[profile.conflictStyle],
+    },
+    {
+      label: 'Time',
+      text: {
+        past:    'You live with significant reference to what has already happened. Memory is your primary way of making sense.',
+        present: 'You are grounded in the immediate. What\'s in front of you is the most real thing you have.',
+        future:  'You live ahead of yourself. The present is a means of getting somewhere — and you already know roughly where.',
+      }[profile.timeOrientation],
+    },
   ]
 }
 
@@ -253,12 +320,32 @@ export function generateSynthesis(profile) {
       text: "You hold firm on principle and you hold onto the past. The things that shaped you are still load-bearing in your decisions.",
     },
     {
-      when: p => p.valueSystem === 'utilitarian' && p.attachmentCore === 'future',
-      text: "You optimize for outcomes and anchor to possibility. You are consistently oriented toward what comes next.",
+      when: p => p.valueSystem === 'utilitarian' && p.timeOrientation === 'future',
+      text: "You optimize for outcomes and orient toward what's coming. Every decision is partly an investment in a version of the future you're building.",
     },
     {
       when: p => p.valueSystem === 'contextual' && p.socialOrientation === 'adaptive',
       text: "No fixed rules, no fixed allegiances — you read each situation fresh. Whether that's sophistication or avoidance of commitment is worth sitting with.",
+    },
+    {
+      when: p => p.conflictStyle === 'direct' && p.socialOrientation === 'independent',
+      text: "You move toward friction and you move alone. That combination produces real change — and real collateral.",
+    },
+    {
+      when: p => p.conflictStyle === 'avoidant' && p.biasAwareness === 'low',
+      text: "You step back from confrontation and hold your ground when shown the mechanism. There's a consistency to your protective instincts.",
+    },
+    {
+      when: p => p.mortalityStyle === 'legacy' && p.timeOrientation === 'future',
+      text: "You're building toward something beyond your own life and already living in that future. That clarity of direction is rare — and demanding.",
+    },
+    {
+      when: p => p.mortalityStyle === 'present' && p.timeOrientation === 'present',
+      text: "You are here, fully and consistently. That kind of groundedness is not passivity — it's a discipline.",
+    },
+    {
+      when: p => p.mortalityStyle === 'avoidant' && p.timeOrientation === 'past',
+      text: "You look back more than forward, and you keep the limit at arm's length. The past feels safer than what finitude implies about the future.",
     },
     {
       when: p => p.finalChoice === 'questioning' && p.biasAwareness === 'low',
@@ -273,16 +360,194 @@ export function generateSynthesis(profile) {
       text: "You accepted the profile and moved when shown the mechanism — twice. You have a habit of letting evidence update you. That's harder than it sounds.",
     },
   ]
-  return combos.filter(c => c.when(profile)).slice(0, 2)
+  return combos.filter(c => c.when(profile)).slice(0, 3)
+}
+
+const ARCHETYPES = [
+  {
+    id: 'architect',
+    name: 'The Architect',
+    criteria: [
+      { fn: p => p.mindType === 'analytical', weight: 3 },
+      { fn: p => p.valueSystem === 'principled', weight: 3 },
+      { fn: p => p.socialOrientation === 'independent', weight: 2 },
+      { fn: p => p.attention === 'focused', weight: 2 },
+      { fn: p => p.conflictStyle === 'direct', weight: 1 },
+    ],
+    portrait: 'You build systems before you build anything else. The framework matters as much as what it holds. You think in structures — and the most important structure you maintain is your own consistency.',
+    shadow: 'The map can become more real than the territory. You may resist what doesn\'t fit the system, even when it should.',
+    gift: 'You see the shape of things before they exist. Your clarity is a form of care.',
+  },
+  {
+    id: 'realist',
+    name: 'The Realist',
+    criteria: [
+      { fn: p => p.mindType === 'analytical', weight: 2 },
+      { fn: p => p.valueSystem === 'utilitarian', weight: 3 },
+      { fn: p => p.conflictStyle === 'direct', weight: 3 },
+      { fn: p => p.biasAwareness === 'low', weight: 1 },
+      { fn: p => p.socialOrientation === 'independent', weight: 1 },
+    ],
+    portrait: 'You see things as they are and move accordingly. Not cynical — accurate. You optimize because you understand the cost of not optimizing, and you\'ve paid it before.',
+    shadow: 'What can\'t be measured can still matter enormously. The unmeasurable tends to get underweighted in your calculations.',
+    gift: 'You cut through noise and sentiment to find the actual problem. This is rarer than it looks.',
+  },
+  {
+    id: 'navigator',
+    name: 'The Navigator',
+    criteria: [
+      { fn: p => p.mindType === 'analytical', weight: 2 },
+      { fn: p => p.valueSystem === 'contextual', weight: 3 },
+      { fn: p => p.socialOrientation === 'adaptive', weight: 3 },
+      { fn: p => p.conflictStyle === 'diplomatic', weight: 2 },
+    ],
+    portrait: 'You read situations the way a sailor reads water — constantly adjusting. You hold multiple frameworks at once and apply them selectively. You find the third option others didn\'t see.',
+    shadow: 'Without fixed principles, your flexibility can look like inconsistency — or feel like it from the inside.',
+    gift: 'You solve problems others have given up on by refusing to accept the given frame.',
+  },
+  {
+    id: 'idealist',
+    name: 'The Idealist',
+    criteria: [
+      { fn: p => p.mindType === 'intuitive', weight: 2 },
+      { fn: p => p.valueSystem === 'principled', weight: 3 },
+      { fn: p => p.socialOrientation === 'independent', weight: 2 },
+      { fn: p => p.finalChoice === 'questioning', weight: 2 },
+      { fn: p => p.mortalityStyle === 'legacy', weight: 1 },
+    ],
+    portrait: 'You hold a vision of how things should be and refuse to fully compromise it. You are moved by possibility — and the distance between what is and what could be is not a source of despair but a source of direction.',
+    shadow: 'Attachment to the ideal can make the real feel like constant failure. The gap between vision and reality is permanent.',
+    gift: 'You pull others toward standards they would not have reached alone.',
+  },
+  {
+    id: 'seeker',
+    name: 'The Seeker',
+    criteria: [
+      { fn: p => p.mindType === 'intuitive', weight: 2 },
+      { fn: p => p.valueSystem === 'contextual', weight: 3 },
+      { fn: p => p.timeOrientation === 'future', weight: 2 },
+      { fn: p => p.finalChoice === 'questioning', weight: 2 },
+      { fn: p => p.attention === 'scattered', weight: 1 },
+    ],
+    portrait: 'You follow the question wherever it leads. You are uncomfortable with closed answers and drawn to the edges of what is known. Arrival feels like loss.',
+    shadow: 'Accumulation without integration can leave you rich in experience and thin in rootedness.',
+    gift: 'You push past boundaries that others have accepted as walls.',
+  },
+  {
+    id: 'forge',
+    name: 'The Forge',
+    criteria: [
+      { fn: p => p.mindType === 'intuitive', weight: 2 },
+      { fn: p => p.valueSystem === 'utilitarian', weight: 2 },
+      { fn: p => p.conflictStyle === 'direct', weight: 3 },
+      { fn: p => p.socialOrientation === 'independent', weight: 2 },
+      { fn: p => p.biasAwareness === 'low', weight: 1 },
+    ],
+    portrait: 'You move through resistance rather than around it. Confrontation is not something you avoid — it\'s a tool. You create change in situations where others are still waiting for permission.',
+    shadow: 'You can leave scorch marks on people who needed gentleness instead of force.',
+    gift: 'You break logjams. You make things happen that would otherwise stay stuck forever.',
+  },
+  {
+    id: 'empath',
+    name: 'The Empath',
+    criteria: [
+      { fn: p => p.attention === 'selective', weight: 2 },
+      { fn: p => p.socialOrientation === 'conformist', weight: 3 },
+      { fn: p => p.conflictStyle === 'diplomatic', weight: 2 },
+      { fn: p => p.valueSystem === 'contextual', weight: 2 },
+      { fn: p => ['relationships', 'friendship', 'home'].includes(p.attachmentCore), weight: 1 },
+    ],
+    portrait: 'You read rooms and people with unusual precision. You adapt not to disappear into the group but to meet it. You feel the weight of what\'s unsaid in almost every interaction.',
+    shadow: 'Your attunement can become self-erasure. The thread of what you actually want can get lost in tracking everyone else.',
+    gift: 'You make people feel genuinely seen — which is rarer and more valuable than most people realize.',
+  },
+  {
+    id: 'diplomat',
+    name: 'The Diplomat',
+    criteria: [
+      { fn: p => p.mindType === 'balanced', weight: 2 },
+      { fn: p => p.socialOrientation === 'adaptive', weight: 3 },
+      { fn: p => p.conflictStyle === 'diplomatic', weight: 3 },
+      { fn: p => p.valueSystem === 'contextual', weight: 1 },
+    ],
+    portrait: 'You translate between people. You understand multiple positions simultaneously and can articulate each one better than the person who holds it. You build bridges where others only see the gap.',
+    shadow: 'You can delay necessary confrontation indefinitely in the name of keeping the peace. Some things need to be broken before they can be fixed.',
+    gift: 'You find agreement where others see irreconcilable difference.',
+  },
+  {
+    id: 'anchor',
+    name: 'The Anchor',
+    criteria: [
+      { fn: p => p.mindType === 'balanced', weight: 1 },
+      { fn: p => p.valueSystem === 'principled', weight: 2 },
+      { fn: p => p.socialOrientation === 'conformist', weight: 2 },
+      { fn: p => p.conflictStyle === 'diplomatic', weight: 2 },
+      { fn: p => p.mortalityStyle === 'present', weight: 2 },
+      { fn: p => ['home', 'relationships', 'promise'].includes(p.attachmentCore), weight: 1 },
+    ],
+    portrait: 'You are the person people return to. You provide stability without demanding credit for it. Your reliability is a kind of generosity that goes largely unnoticed — except by those who depend on it.',
+    shadow: 'You can carry others\' weight until it becomes resentment. Stability for others can come at the cost of your own becoming.',
+    gift: 'You make the ground under people\'s feet feel solid. That is not a small thing.',
+  },
+  {
+    id: 'witness',
+    name: 'The Witness',
+    criteria: [
+      { fn: p => p.mindType === 'analytical', weight: 2 },
+      { fn: p => p.conflictStyle === 'avoidant', weight: 3 },
+      { fn: p => p.attention === 'focused', weight: 2 },
+      { fn: p => p.socialOrientation === 'independent', weight: 2 },
+      { fn: p => p.finalChoice === 'acceptance', weight: 1 },
+    ],
+    portrait: 'You observe more than you act, and your observations are precise. You let things reveal themselves rather than forcing the reveal. You are often the most accurate person in the room — and sometimes the quietest.',
+    shadow: 'Distance can look like wisdom when it\'s actually protection. Not all observation is detachment; some is avoidance.',
+    gift: 'You see the full picture before others know one exists.',
+  },
+  {
+    id: 'guardian',
+    name: 'The Guardian',
+    criteria: [
+      { fn: p => p.valueSystem === 'principled', weight: 2 },
+      { fn: p => p.conflictStyle === 'direct', weight: 2 },
+      { fn: p => ['wounds', 'past_self', 'failure', 'promise'].includes(p.attachmentCore), weight: 3 },
+      { fn: p => p.timeOrientation === 'past', weight: 2 },
+      { fn: p => p.mortalityStyle === 'legacy', weight: 1 },
+    ],
+    portrait: 'You carry what shaped you and use it. Your principles are not abstract — they were earned. You protect things others don\'t see the value of yet.',
+    shadow: 'You can hold a wound so long it becomes identity. The things that forged you can also limit you.',
+    gift: 'Your convictions have weight because they cost you something. That\'s the difference between principle and preference.',
+  },
+  {
+    id: 'wanderer',
+    name: 'The Wanderer',
+    criteria: [
+      { fn: p => p.mindType === 'intuitive', weight: 2 },
+      { fn: p => p.socialOrientation === 'independent', weight: 2 },
+      { fn: p => p.mortalityStyle === 'present', weight: 2 },
+      { fn: p => p.timeOrientation === 'present', weight: 2 },
+      { fn: p => p.attention === 'scattered', weight: 2 },
+    ],
+    portrait: 'You move through the world collecting experience, perspective, and encounter. You are not lost — you have simply not decided to arrive. Each phase feels complete on its own terms.',
+    shadow: 'Range without depth can become a pattern of beginning without finishing.',
+    gift: 'You see connections across domains that specialists miss. You bring outside context to inside problems.',
+  },
+]
+
+export function computeArchetype(profile) {
+  const scored = ARCHETYPES.map(a => ({
+    ...a,
+    score: a.criteria.reduce((s, c) => s + (c.fn(profile) ? c.weight : 0), 0),
+  }))
+  return scored.sort((a, b) => b.score - a.score)[0]
 }
 
 export function computeCycleMeta(cycleHistory, currentProfile) {
   if (!cycleHistory.length || !currentProfile) return null
-  const dims = ['mindType', 'valueSystem', 'attention', 'biasAwareness', 'socialOrientation', 'attachmentCore']
+  const dims = ['mindType', 'valueSystem', 'attention', 'biasAwareness', 'socialOrientation', 'attachmentCore', 'mortalityStyle', 'conflictStyle', 'timeOrientation']
   const all  = [...cycleHistory.map(h => h.profile), currentProfile]
   return dims.map(dim => {
-    const values   = all.map(p => p[dim])
-    const unique   = [...new Set(values)]
+    const values    = all.map(p => p[dim])
+    const unique    = [...new Set(values)]
     const consistent = unique.length === 1
     return { dim, values, consistent, current: currentProfile[dim] }
   })
@@ -418,6 +683,33 @@ function gameReducer(state, action) {
         },
       }
 
+    case 'TRACK_MORTALITY':
+      return {
+        ...state,
+        tracking: {
+          ...state.tracking,
+          mortality: { answers: [...state.tracking.mortality.answers, action.value] },
+        },
+      }
+
+    case 'TRACK_CONFLICT':
+      return {
+        ...state,
+        tracking: {
+          ...state.tracking,
+          conflict: { answers: [...state.tracking.conflict.answers, action.value] },
+        },
+      }
+
+    case 'TRACK_TIME':
+      return {
+        ...state,
+        tracking: {
+          ...state.tracking,
+          time: { answers: [...state.tracking.time.answers, action.value] },
+        },
+      }
+
     case 'TRACK_FINAL_CHOICE': {
       const tracking = { ...state.tracking, detachment: { finalChoice: action.choice } }
       return { ...state, tracking, profile: computeProfile(tracking), screen: 'profile' }
@@ -432,7 +724,7 @@ function gameReducer(state, action) {
 }
 
 const GameContext = createContext(null)
-const STORAGE_KEY = 'echo_state_v1'
+const STORAGE_KEY = 'echo_state_v2'
 
 export function GameProvider({ children }) {
   const [state, dispatch] = useReducer(
