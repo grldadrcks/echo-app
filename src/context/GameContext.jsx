@@ -575,7 +575,9 @@ function gameReducer(state, action) {
       if (next >= REALMS.length) {
         return { ...state, screen: 'profile', profile: computeProfile(state.tracking) }
       }
-      return { ...state, screen: 'transition', pendingRealm: next }
+      // Pre-compute profile when entering the final realm so it's available for the reveal phase
+      const profile = next === REALMS.length - 1 ? computeProfile(state.tracking) : state.profile
+      return { ...state, screen: 'transition', pendingRealm: next, profile }
     }
 
     case 'COMPLETE_TRANSITION':
@@ -724,7 +726,7 @@ function gameReducer(state, action) {
 }
 
 const GameContext = createContext(null)
-const STORAGE_KEY = 'echo_state_v2'
+const STORAGE_KEY = 'echo_state_v3'
 
 export function GameProvider({ children }) {
   const [state, dispatch] = useReducer(
