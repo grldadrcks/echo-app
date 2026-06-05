@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useGame } from '../context/GameContext.jsx'
+import { tapLight } from '../lib/haptics.js'
 
 const VARIANTS = [
   {
@@ -62,6 +63,7 @@ export default function AttachmentRealm() {
 
   function handleSurrender(anchor) {
     if (selecting || chosen) return
+    tapLight()
     setChosen(anchor.id)
     setSelecting(true)
 

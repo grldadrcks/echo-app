@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useGame, REALMS } from '../context/GameContext.jsx'
+import { tapMedium } from '../lib/haptics.js'
 import NatureRealm      from '../realms/NatureRealm.jsx'
 import AbstractionRealm from '../realms/AbstractionRealm.jsx'
 import PerceptionRealm  from '../realms/PerceptionRealm.jsx'
@@ -63,7 +64,7 @@ function RealmIntro({ realm, onEnter }) {
         className="relative z-10 transition-all duration-500"
         style={{ opacity: btnVisible ? 1 : 0, transform: btnVisible ? 'translateY(0)' : 'translateY(8px)' }}
       >
-        <button onClick={onEnter} className="btn-realm mono tracking-widest uppercase text-sm">
+        <button onClick={() => { tapMedium(); onEnter() }} className="btn-realm mono tracking-widest uppercase text-sm">
           BEGIN
         </button>
       </div>

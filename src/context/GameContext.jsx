@@ -214,6 +214,68 @@ export function generateNarrative(profile) {
   ]
 }
 
+export function generateSynthesis(profile) {
+  const combos = [
+    {
+      when: p => p.mindType === 'intuitive' && p.socialOrientation === 'conformist',
+      text: "Your instincts are real — but porous to the room. You move by feel, and social gravity pulls on that movement without you always noticing.",
+    },
+    {
+      when: p => p.mindType === 'intuitive' && p.socialOrientation === 'independent',
+      text: "Fast and solitary. You trust the signal before it has a name, and you don't wait for the room to confirm it.",
+    },
+    {
+      when: p => p.mindType === 'analytical' && p.socialOrientation === 'conformist',
+      text: "You calculate, and then you yield. Whether that's wisdom or a failure of nerve is a question only you can answer.",
+    },
+    {
+      when: p => p.mindType === 'analytical' && p.socialOrientation === 'independent',
+      text: "You build your own framework and live inside it. The group's answer registers as data — not direction.",
+    },
+    {
+      when: p => p.mindType === 'balanced' && p.socialOrientation === 'adaptive',
+      text: "You shift mode based on context — instinct when it's called for, structure when it isn't, group calibration when useful. That's not indecision. It's range.",
+    },
+    {
+      when: p => p.attention === 'focused' && p.biasAwareness === 'high',
+      text: "You see clearly and you moved when shown the mechanism. That combination is uncommon — most people do one or the other.",
+    },
+    {
+      when: p => p.attention === 'scattered' && p.biasAwareness === 'low',
+      text: "Wide perception, slow correction. You catch things at the edges that others miss — but the center drifts without you noticing.",
+    },
+    {
+      when: p => p.attention === 'focused' && p.biasAwareness === 'low',
+      text: "Precise attention, resistant updating. You see what you point at very clearly — and that focus makes it harder to redirect when evidence shifts.",
+    },
+    {
+      when: p => p.valueSystem === 'principled' && ['wounds', 'past_self', 'failure'].includes(p.attachmentCore),
+      text: "You hold firm on principle and you hold onto the past. The things that shaped you are still load-bearing in your decisions.",
+    },
+    {
+      when: p => p.valueSystem === 'utilitarian' && p.attachmentCore === 'future',
+      text: "You optimize for outcomes and anchor to possibility. You are consistently oriented toward what comes next.",
+    },
+    {
+      when: p => p.valueSystem === 'contextual' && p.socialOrientation === 'adaptive',
+      text: "No fixed rules, no fixed allegiances — you read each situation fresh. Whether that's sophistication or avoidance of commitment is worth sitting with.",
+    },
+    {
+      when: p => p.finalChoice === 'questioning' && p.biasAwareness === 'low',
+      text: "You chose to question everything — but when shown the mechanism of your bias, you didn't change course. That gap between stated inquiry and actual movement is significant.",
+    },
+    {
+      when: p => p.finalChoice === 'acceptance' && p.socialOrientation === 'independent',
+      text: "You accepted what you saw on your own terms — not because someone told you to. That's a meaningful distinction.",
+    },
+    {
+      when: p => p.finalChoice === 'acceptance' && p.biasAwareness === 'high',
+      text: "You accepted the profile and moved when shown the mechanism — twice. You have a habit of letting evidence update you. That's harder than it sounds.",
+    },
+  ]
+  return combos.filter(c => c.when(profile)).slice(0, 2)
+}
+
 export function computeCycleMeta(cycleHistory, currentProfile) {
   if (!cycleHistory.length || !currentProfile) return null
   const dims = ['mindType', 'valueSystem', 'attention', 'biasAwareness', 'socialOrientation', 'attachmentCore']

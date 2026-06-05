@@ -1,130 +1,131 @@
 import { useState } from 'react'
 import { useGame } from '../context/GameContext.jsx'
+import { tapLight } from '../lib/haptics.js'
 
 const VARIANTS = [
   [
     {
-      id: 'trolley',
-      premise: 'A runaway trolley will kill five people. You can pull a lever to divert it, killing one instead. You pull it.',
-      prompt: 'What best describes your reasoning?',
+      id: 'honest_opinion',
+      premise: 'A close friend asks for your honest opinion on a decision they\'ve already made and cannot reverse. Being honest will hurt them. Nothing will change.',
+      prompt: 'What do you do?',
       options: [
-        { label: 'Five deaths prevented. The math is clear.',   value: 'utilitarian' },
-        { label: 'I acted. That act belongs to me now.',        value: 'principled'  },
-        { label: 'It depends on who the one person is.',        value: 'contextual'  },
+        { label: 'Tell them. Truth isn\'t responsible for what people do with it.', value: 'principled'  },
+        { label: 'Don\'t. Information that changes nothing only causes pain.',       value: 'utilitarian' },
+        { label: 'Depends on whether they\'re asking to grow or seeking validation.', value: 'contextual' },
       ],
     },
     {
-      id: 'theseus',
-      premise: 'Every plank of a ship is replaced over time. When the last original plank is gone — is it still the same ship?',
-      prompt: 'Which position do you hold?',
+      id: 'take_credit',
+      premise: 'You can prevent something bad from happening — but only by taking credit for work that isn\'t yours. No one will ever find out.',
+      prompt: 'What do you do?',
       options: [
-        { label: 'No. Identity requires material continuity.',   value: 'principled'  },
-        { label: 'Yes. What matters is the function it serves.', value: 'utilitarian' },
-        { label: 'It depends on who is asking and why.',         value: 'contextual'  },
+        { label: 'No. What you do in private is still what you do.',               value: 'principled'  },
+        { label: 'Yes. Outcomes matter more than the mechanics that produce them.', value: 'utilitarian' },
+        { label: 'Depends on how bad the thing is and how much credit you\'re claiming.', value: 'contextual' },
       ],
     },
     {
-      id: 'sorites',
-      premise: 'Remove one grain from a heap of sand. Still a heap. Keep removing — when does it stop being a heap?',
-      prompt: 'Your view:',
+      id: 'share_truth',
+      premise: 'You know something true about someone that would significantly change how others see them. They didn\'t ask you to keep it secret.',
+      prompt: 'Do you share it?',
       options: [
-        { label: 'The line is arbitrary but must be drawn.',     value: 'principled'  },
-        { label: 'There is no heap — only grains and context.',  value: 'contextual'  },
-        { label: 'A heap is defined by its use, not its count.', value: 'utilitarian' },
+        { label: 'Only if sharing it prevents a clear harm.',                  value: 'utilitarian' },
+        { label: 'No. Information about someone belongs to them first.',       value: 'principled'  },
+        { label: 'Depends what it is and who needs to know.',                  value: 'contextual'  },
       ],
     },
     {
-      id: 'identity',
-      premise: 'You wake up tomorrow with all your memories, but a different body, name, and history. Are you still you?',
-      prompt: 'What do you believe?',
+      id: 'broken_rule',
+      premise: 'A rule you believe in produces an outcome you find clearly wrong in this specific case. Following it will cause real harm.',
+      prompt: 'Do you break it?',
       options: [
-        { label: 'Memory is identity. Yes.',                    value: 'principled'  },
-        { label: 'What I do next is who I am.',                 value: 'utilitarian' },
-        { label: 'The question assumes identity is fixed.',     value: 'contextual'  },
+        { label: 'No. Rules matter because they hold even when they\'re inconvenient.', value: 'principled'  },
+        { label: 'Yes. A rule that produces wrong outcomes has already failed.',         value: 'utilitarian' },
+        { label: 'Depends on how wrong the outcome is and how often the rule works.',    value: 'contextual'  },
       ],
     },
   ],
   [
     {
-      id: 'experience_machine',
-      premise: 'A machine can give you any experience indistinguishable from reality — your ideal life, forever. Do you plug in?',
+      id: 'manipulative_mentor',
+      premise: 'You discover that a mentor who shaped who you are was manipulating you the whole time — but the lessons they taught you are genuinely good.',
+      prompt: 'What holds?',
+      options: [
+        { label: 'The lessons hold. Ideas aren\'t guilty by association.',                    value: 'principled'  },
+        { label: 'Keep what works, discard what doesn\'t. Source is irrelevant.',             value: 'utilitarian' },
+        { label: 'Some will hold, some won\'t. You\'d need to look at each one separately.', value: 'contextual'  },
+      ],
+    },
+    {
+      id: 'imperfect_charity',
+      premise: 'A charitable organization you support does genuine good — but also uses some of your donations in ways you find clearly unethical.',
+      prompt: 'What do you do?',
+      options: [
+        { label: 'Stop. You can\'t choose which part of your money they use.',              value: 'principled'  },
+        { label: 'Continue if the good outweighs the harm. Perfection isn\'t available.',   value: 'utilitarian' },
+        { label: 'Depends on the scale of both the good and the harm.',                     value: 'contextual'  },
+      ],
+    },
+    {
+      id: 'stranger_mistake',
+      premise: 'You can intervene to prevent a stranger\'s significant mistake — but doing so means inserting yourself into something that isn\'t your concern.',
+      prompt: 'Do you intervene?',
+      options: [
+        { label: 'Yes. A preventable harm is your business.',                 value: 'utilitarian' },
+        { label: 'No. People have the right to make their own mistakes.',     value: 'principled'  },
+        { label: 'Depends on how significant the mistake is and what it costs you.', value: 'contextual' },
+      ],
+    },
+    {
+      id: 'changed_promise',
+      premise: 'You made a meaningful promise to someone who has since become a fundamentally different person. The original context no longer exists.',
+      prompt: 'Are you still bound?',
+      options: [
+        { label: 'Yes. Promises are made to people, not versions of them.',    value: 'principled'  },
+        { label: 'No. The context that gave the promise meaning is gone.',     value: 'utilitarian' },
+        { label: 'Depends on what the promise was and how much they\'ve changed.', value: 'contextual' },
+      ],
+    },
+  ],
+  [
+    {
+      id: 'rejected_truth',
+      premise: 'You can tell someone a true and important thing about themselves — something they need to hear. They will almost certainly reject it.',
+      prompt: 'Do you say it?',
+      options: [
+        { label: 'Yes. What they do with it is their choice, not yours.',              value: 'principled'  },
+        { label: 'Only if there\'s a real chance they\'ll hear it. Otherwise it\'s just pain.', value: 'utilitarian' },
+        { label: 'Depends on the relationship and what\'s at stake.',                  value: 'contextual'  },
+      ],
+    },
+    {
+      id: 'enforce_policy',
+      premise: 'You\'re asked to enforce a policy you believe is unjust, in a case where no one would know if you didn\'t.',
+      prompt: 'What do you do?',
+      options: [
+        { label: 'Enforce it. You agreed to the role, not just the parts you like.', value: 'principled'  },
+        { label: 'Don\'t. A policy that produces injustice should be resisted.',     value: 'utilitarian' },
+        { label: 'Depends on how unjust and whether there\'s a better path.',        value: 'contextual'  },
+      ],
+    },
+    {
+      id: 'unwitnessed_harm',
+      premise: 'Someone caused a real harm unintentionally. No one else witnessed it. The person who was harmed will never know. Do they need to be told?',
       prompt: 'Your position:',
       options: [
-        { label: 'Yes — if the experience is real to me, it is real.',              value: 'utilitarian' },
-        { label: 'No — something about genuine engagement with reality matters.',   value: 'principled'  },
-        { label: 'It depends entirely on what I\'d be leaving behind.',             value: 'contextual'  },
+        { label: 'Yes. People deserve to know the effects of their actions.',           value: 'principled'  },
+        { label: 'Only if telling them will change future behavior.',                   value: 'utilitarian' },
+        { label: 'Depends on the harm and whether knowing would actually help anything.', value: 'contextual' },
       ],
     },
     {
-      id: 'utility_monster',
-      premise: 'Imagine a being that gets vastly more pleasure from resources than anyone else. Strict utilitarianism says give it everything. Does that feel right?',
-      prompt: 'What do you think?',
+      id: 'shared_credit',
+      premise: 'You are given full credit for something that was partly someone else\'s work. They\'re unaware. Correcting the record has no practical consequence.',
+      prompt: 'Do you correct it?',
       options: [
-        { label: 'Yes — if it maximizes total happiness, logic demands it.',         value: 'utilitarian' },
-        { label: 'No — there must be rights that override total utility.',           value: 'principled'  },
-        { label: 'The scenario reveals a flaw in the framework, not a rule to follow.', value: 'contextual' },
-      ],
-    },
-    {
-      id: 'teleporter',
-      premise: 'A teleporter scans you, destroys the original, and assembles an identical copy at the destination with all your memories. Is the copy you?',
-      prompt: 'Your answer:',
-      options: [
-        { label: 'No — the original was destroyed. The copy is someone new.',             value: 'principled'  },
-        { label: 'Yes — if they function as me in every way, they are me.',               value: 'utilitarian' },
-        { label: 'The answer depends on whether consciousness can survive discontinuity.', value: 'contextual'  },
-      ],
-    },
-    {
-      id: 'moral_luck',
-      premise: 'Two drivers run red lights while drunk. One hits no one. The other kills a pedestrian. Should they be judged differently?',
-      prompt: 'What is right?',
-      options: [
-        { label: 'No — the moral failure is identical. Luck shouldn\'t change judgment.', value: 'principled'  },
-        { label: 'Yes — outcomes matter. We live in a world of consequences.',             value: 'utilitarian' },
-        { label: 'Yes and no — intent and outcome both carry weight.',                     value: 'contextual'  },
-      ],
-    },
-  ],
-  [
-    {
-      id: 'veil',
-      premise: 'You don\'t know whether you\'ll be born rich or poor, majority or minority. Behind this veil of ignorance, what kind of society do you design?',
-      prompt: 'Your choice:',
-      options: [
-        { label: 'One that maximizes the average quality of life across everyone.',          value: 'utilitarian' },
-        { label: 'One that guarantees the best possible outcome for the worst-off.',         value: 'principled'  },
-        { label: 'One with strong basic rights, then individual freedom for the rest.',      value: 'contextual'  },
-      ],
-    },
-    {
-      id: 'violinist',
-      premise: 'You wake up connected to a dying violinist who needs your kidneys for nine months. Disconnecting kills him. Are you obligated to stay?',
-      prompt: 'What do you believe?',
-      options: [
-        { label: 'No — you have the right to your own body, even to save another.',                      value: 'principled'  },
-        { label: 'Yes — the outcome of his death outweighs nine months of discomfort.',                  value: 'utilitarian' },
-        { label: 'It depends on how you came to be connected and what obligations flow from that.',       value: 'contextual'  },
-      ],
-    },
-    {
-      id: 'simulation',
-      premise: 'Evidence suggests our universe might be a simulation. If true, does that change the moral weight of your actions?',
-      prompt: 'Your view:',
-      options: [
-        { label: 'No — consequences are real to those who experience them.',                      value: 'utilitarian' },
-        { label: 'No — moral duties don\'t depend on the substrate of reality.',                  value: 'principled'  },
-        { label: 'It raises questions worth sitting with, even without changing behavior.',        value: 'contextual'  },
-      ],
-    },
-    {
-      id: 'surprise_exam',
-      premise: 'A teacher says there will be a surprise exam next week. A student logically proves this is impossible. The exam happens Wednesday and the student is surprised. What failed?',
-      prompt: 'What do you think broke down?',
-      options: [
-        { label: 'The student\'s logic was correct but missed something about knowledge itself.',  value: 'principled'  },
-        { label: 'The teacher\'s statement was inherently self-contradictory.',                    value: 'utilitarian' },
-        { label: 'Logic has limits when applied to self-referential claims about knowledge.',      value: 'contextual'  },
+        { label: 'Yes. Credit belongs where the work was done.',                           value: 'principled'  },
+        { label: 'Only if correcting it produces a meaningful outcome for them.',          value: 'utilitarian' },
+        { label: 'Depends on how much was theirs and what correcting it would cost.',      value: 'contextual'  },
       ],
     },
   ],
@@ -140,6 +141,7 @@ export default function AbstractionRealm() {
 
   function handleSelect(opt) {
     if (selected !== null) return
+    tapLight()
     setSelected(opt.value)
     dispatch({ type: 'TRACK_ABSTRACTION_ANSWER', value: opt.value })
     setTimeout(() => {

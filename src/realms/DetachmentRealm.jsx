@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useGame, generateNarrative } from '../context/GameContext.jsx'
+import { tapLight, tapMedium } from '../lib/haptics.js'
 
 const INTRO_VARIANTS = [
   [
@@ -114,7 +115,7 @@ export default function DetachmentRealm() {
         ))}
         {showReveal && (
           <div className="pt-6 animate-fade-in">
-            <button onClick={() => setPhase('reveal')} className="btn-realm mono tracking-widest uppercase text-sm">
+            <button onClick={() => { tapMedium(); setPhase('reveal') }} className="btn-realm mono tracking-widest uppercase text-sm">
               SEE YOUR PATTERN
             </button>
           </div>
@@ -138,7 +139,7 @@ export default function DetachmentRealm() {
             </div>
           ))}
         </div>
-        <button onClick={() => setPhase('choice')} className="btn-ghost mono text-sm tracking-wide">
+        <button onClick={() => { tapLight(); setPhase('choice') }} className="btn-ghost mono text-sm tracking-wide">
           Continue
         </button>
       </div>
@@ -154,11 +155,11 @@ export default function DetachmentRealm() {
           </p>
         </div>
         <div className="space-y-3">
-          <button onClick={() => dispatch({ type: 'TRACK_FINAL_CHOICE', choice: 'acceptance' })}
+          <button onClick={() => { tapMedium(); dispatch({ type: 'TRACK_FINAL_CHOICE', choice: 'acceptance' }) }}
             className="btn-realm mono tracking-wide text-sm">
             ACCEPT WHAT YOU'VE SEEN
           </button>
-          <button onClick={() => dispatch({ type: 'TRACK_FINAL_CHOICE', choice: 'questioning' })}
+          <button onClick={() => { tapMedium(); dispatch({ type: 'TRACK_FINAL_CHOICE', choice: 'questioning' }) }}
             className="btn-ghost mono tracking-wide text-sm">
             QUESTION EVERYTHING
           </button>

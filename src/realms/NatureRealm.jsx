@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useGame } from '../context/GameContext.jsx'
+import { tapLight } from '../lib/haptics.js'
 
 const VARIANTS = [
   [
@@ -41,6 +42,7 @@ export default function NatureRealm() {
 
   function handleSelect(option) {
     if (selected !== null) return
+    tapLight()
     const ms = Date.now() - startTimeRef.current
     setSelected(option)
     dispatch({ type: 'TRACK_NATURE_RESPONSE', ms })

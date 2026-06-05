@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useGame, generateNarrative, computeCycleMeta, REALMS } from '../context/GameContext.jsx'
+import { useGame, generateNarrative, generateSynthesis, computeCycleMeta, REALMS } from '../context/GameContext.jsx'
 
 const DIM_LABELS = {
   mindType:          { label: 'MIND TYPE',  map: { intuitive: 'Intuitive', analytical: 'Analytical', balanced: 'Balanced' } },
@@ -172,8 +172,9 @@ export default function ProfileScreen() {
   const [descending,    setDescending]    = useState(false)
   const [copied,        setCopied]        = useState(false)
 
-  const narrative = profile ? generateNarrative(profile) : []
-  const cycleMeta = computeCycleMeta(cycleHistory, profile)
+  const narrative  = profile ? generateNarrative(profile) : []
+  const synthesis  = profile ? generateSynthesis(profile) : []
+  const cycleMeta  = computeCycleMeta(cycleHistory, profile)
 
   useEffect(() => {
     if (!profile) return
@@ -276,6 +277,19 @@ export default function ProfileScreen() {
             )
           })}
         </div>
+
+        {/* Cross-dimension synthesis */}
+        {showCard && synthesis.length > 0 && (
+          <div className="animate-fade-in space-y-3">
+            <p className="mono text-xs text-slate-600 tracking-widest">SYNTHESIS</p>
+            {synthesis.map((s, i) => (
+              <div key={i} className="rounded-2xl p-4"
+                style={{ background: 'rgba(var(--realm-accent-rgb), 0.04)', border: '1px solid rgba(var(--realm-accent-rgb), 0.12)' }}>
+                <p className="text-slate-300 text-sm leading-relaxed">{s.text}</p>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Cross-cycle history (cycle 2+) */}
         {showCard && cycleMeta && (

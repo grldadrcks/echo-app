@@ -1,22 +1,23 @@
 import { useEffect, useState } from 'react'
 import { useGame, REALMS } from '../context/GameContext.jsx'
+import { tapMedium } from '../lib/haptics.js'
 
 export default function TransitionScreen() {
   const { dispatch, currentRealm, pendingRealm } = useGame()
-  const [phase, setPhase] = useState('out')   // 'out' | 'in' | 'ready'
-  const [canTap, setCanTap] = useState(false)
+  const [phase,        setPhase]        = useState('out')
+  const [canTap,       setCanTap]       = useState(false)
+  const [interfering,  setInterfering]  = useState(true)
 
   const completedRealm = REALMS[currentRealm]
   const nextRealm      = REALMS[pendingRealm]
 
   useEffect(() => {
-    // Brief pause, then fade in debrief
+    tapMedium()
+    const ti = setTimeout(() => setInterfering(false), 600)
     const t1 = setTimeout(() => setPhase('in'),    400)
-    // After 2s allow tap-to-continue
     const t2 = setTimeout(() => setCanTap(true),   2200)
-    // Auto-advance after 4.5s
     const t3 = setTimeout(() => dispatch({ type: 'COMPLETE_TRANSITION' }), 4500)
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
+    return () => { clearTimeout(ti); clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
   }, [dispatch])
 
   function handleTap() {
@@ -30,6 +31,11 @@ export default function TransitionScreen() {
       style={{ backgroundColor: 'var(--app-bg)' }}
       onClick={handleTap}
     >
+      {/* Scanline interference on entry */}
+      {interfering && (
+        <div className="absolute inset-0 interference-overlay z-20" />
+      )}
+
       {/* Subtle radial glow from completed realm accent */}
       <div
         className="absolute inset-0 pointer-events-none"
