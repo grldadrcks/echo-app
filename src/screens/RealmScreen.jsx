@@ -13,6 +13,9 @@ import TimeRealm        from '../realms/TimeRealm.jsx'
 import IdentityRealm    from '../realms/IdentityRealm.jsx'
 import AgencyRealm      from '../realms/AgencyRealm.jsx'
 import DesireRealm      from '../realms/DesireRealm.jsx'
+import EmpathyRealm     from '../realms/EmpathyRealm.jsx'
+import RiskRealm        from '../realms/RiskRealm.jsx'
+import TrustRealm       from '../realms/TrustRealm.jsx'
 import DetachmentRealm  from '../realms/DetachmentRealm.jsx'
 
 const COMPONENTS = [
@@ -28,6 +31,9 @@ const COMPONENTS = [
   IdentityRealm,
   AgencyRealm,
   DesireRealm,
+  EmpathyRealm,
+  RiskRealm,
+  TrustRealm,
   DetachmentRealm,
 ]
 

@@ -14,6 +14,9 @@ const DIM_LABELS = {
   identityCore:      { label: 'IDENTITY',   map: { achiever: 'Achiever', relational: 'Relational', experiential: 'Experiential' } },
   agencyStyle:       { label: 'AGENCY',     map: { internal: 'Internal', contextual: 'Contextual', collective: 'Collective' } },
   desireCore:        { label: 'DESIRE',     map: { security: 'Security', connection: 'Connection', growth: 'Growth' } },
+  empathyStyle:      { label: 'EMPATHY',    map: { cognitive: 'Cognitive', affective: 'Affective', contained: 'Contained' } },
+  riskStyle:         { label: 'RISK',       map: { tolerant: 'Tolerant', calibrated: 'Calibrated', averse: 'Averse' } },
+  trustStyle:        { label: 'TRUST',      map: { open: 'Open', earned: 'Earned', contextual: 'Contextual' } },
 }
 
 function RadarChart({ profile, size = 220 }) {

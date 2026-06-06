@@ -122,6 +122,36 @@ export const REALMS = [
     debriefSub: 'Security, connection, or growth — the deepest desire shapes everything above it.',
   },
   {
+    id: 'empathy',
+    label: 'EMPATHY',
+    accent: '#059669',
+    accentRgb: '5,150,105',
+    intro: 'Other people are happening to you, constantly.',
+    introSub: 'This stratum asks how much you let them in.',
+    debrief: 'Your empathic style has been recorded.',
+    debriefSub: 'How you take in others\' inner experience shapes every relationship you have.',
+  },
+  {
+    id: 'risk',
+    label: 'RISK',
+    accent: '#ea580c',
+    accentRgb: '234,88,12',
+    intro: 'The future is uncertain. You act anyway.',
+    introSub: 'This stratum measures how you move through that.',
+    debrief: 'Your relationship to uncertainty has been mapped.',
+    debriefSub: 'Whether you lean toward the unknown or away from it is one of the most consistent things about you.',
+  },
+  {
+    id: 'trust',
+    label: 'TRUST',
+    accent: '#7e22ce',
+    accentRgb: '126,34,206',
+    intro: 'You cannot verify everything.',
+    introSub: 'This stratum asks what you do instead.',
+    debrief: 'Your trust orientation has been noted.',
+    debriefSub: 'How you extend trust — freely, carefully, or situationally — reveals your deepest assumptions about people.',
+  },
+  {
     id: 'detachment',
     label: 'DETACHMENT',
     accent: '#e2e8f0',
@@ -153,6 +183,9 @@ const INITIAL_STATE = {
     identity:    { answers: [] },
     agency:      { answers: [] },
     desire:      { answers: [] },
+    empathy:     { answers: [] },
+    risk:        { answers: [] },
+    trust:       { answers: [] },
     detachment:  { finalChoice: null },
   },
   profile: null,
@@ -172,6 +205,9 @@ function freshTracking() {
     identity:    { answers: [] },
     agency:      { answers: [] },
     desire:      { answers: [] },
+    empathy:     { answers: [] },
+    risk:        { answers: [] },
+    trust:       { answers: [] },
     detachment:  { finalChoice: null },
   }
 }
@@ -223,9 +259,12 @@ function computeProfile(tracking) {
   const identityCore     = plurality(tracking.identity.answers,   ['achiever', 'relational', 'experiential'])
   const agencyStyle      = plurality(tracking.agency.answers,     ['internal', 'contextual', 'collective'])
   const desireCore       = plurality(tracking.desire.answers,     ['security', 'connection', 'growth'])
+  const empathyStyle     = plurality(tracking.empathy.answers,    ['cognitive', 'affective', 'contained'])
+  const riskStyle        = plurality(tracking.risk.answers,       ['tolerant', 'calibrated', 'averse'])
+  const trustStyle       = plurality(tracking.trust.answers,      ['open', 'earned', 'contextual'])
   const finalChoice      = tracking.detachment.finalChoice || 'questioning'
 
-  return { mindType, valueSystem, attention, biasAwareness, socialOrientation, attachmentCore, mortalityStyle, conflictStyle, timeOrientation, identityCore, agencyStyle, desireCore, finalChoice }
+  return { mindType, valueSystem, attention, biasAwareness, socialOrientation, attachmentCore, mortalityStyle, conflictStyle, timeOrientation, identityCore, agencyStyle, desireCore, empathyStyle, riskStyle, trustStyle, finalChoice }
 }
 
 const ATTACHMENT_NARRATIVE = {
@@ -341,6 +380,30 @@ export function generateNarrative(profile) {
         growth:     'What you most fundamentally want is to keep becoming. Stagnation is your version of death — forward motion is what makes life feel real.',
       }[profile.desireCore],
     },
+    {
+      label: 'Empathy',
+      text: {
+        cognitive:  'You understand others clearly and think through their experience — but you tend to stay inside your own perspective while doing it. Your empathy is real; it lives primarily in your mind.',
+        affective:  'Other people\'s feelings reach you directly. You don\'t choose to feel with them — it happens before you decide anything. That is both a gift and a weight.',
+        contained:  'You register others\' experience fully and choose how much to let in. That steadiness isn\'t distance — it\'s how you stay useful to the people who need you.',
+      }[profile.empathyStyle],
+    },
+    {
+      label: 'Risk',
+      text: {
+        tolerant:   'You move toward uncertainty rather than away from it. The unknown is not a threat — it is the place where things become possible.',
+        calibrated: 'You assess before you act, but you act. You want enough information to make a reasonable call, not a perfect one.',
+        averse:     'You weigh what could go wrong before what could go right. That is not timidity — it is a clear-eyed recognition that downside is real.',
+      }[profile.riskStyle],
+    },
+    {
+      label: 'Trust',
+      text: {
+        open:       'You extend trust freely and adjust when you are wrong. The cost of suspicion — in connection, in openness, in what you miss — seems higher to you than the cost of occasional betrayal.',
+        earned:     'Trust must be demonstrated before it is extended. You move slowly and reliably, and you expect the same. That is not coldness — it is a standard.',
+        contextual: 'Your trust is not a fixed setting. It varies by person, by situation, by what is at stake. You read each relationship separately.',
+      }[profile.trustStyle],
+    },
   ]
 }
 
@@ -450,6 +513,30 @@ export function generateSynthesis(profile) {
       when: p => p.desireCore === 'growth' && p.timeOrientation === 'future',
       text: "You are reaching toward something and living ahead of yourself. The present is almost always a means to what comes next. That drive is real — so is the risk of arriving somewhere you forgot to inhabit.",
     },
+    {
+      when: p => p.empathyStyle === 'affective' && p.conflictStyle === 'avoidant',
+      text: "You feel others deeply and step back from friction. That combination makes conflict genuinely costly for you — you absorb the emotional weight of it more than most people realize.",
+    },
+    {
+      when: p => p.empathyStyle === 'cognitive' && p.agencyStyle === 'internal',
+      text: "You understand people clearly and hold yourself accountable for outcomes. That's a productive combination — and a demanding one. You may occasionally underestimate how much others are simply feeling something, not solving something.",
+    },
+    {
+      when: p => p.riskStyle === 'tolerant' && p.agencyStyle === 'internal',
+      text: "You move toward uncertainty and hold yourself as the author of outcomes. That's a high-agency stance — effective when conditions are favorable, costly when they're not.",
+    },
+    {
+      when: p => p.riskStyle === 'averse' && p.desireCore === 'security',
+      text: "You weigh downside carefully and most fundamentally want a life that feels secure. Those two things reinforce each other into something coherent — and something that can quietly limit the range of what you allow yourself to attempt.",
+    },
+    {
+      when: p => p.trustStyle === 'open' && p.empathyStyle === 'affective',
+      text: "You extend trust freely and feel others deeply. That combination makes you genuinely connective — and genuinely vulnerable. You absorb more than most people know.",
+    },
+    {
+      when: p => p.trustStyle === 'earned' && p.conflictStyle === 'direct',
+      text: "You require trust to be demonstrated and you address friction plainly. Together those make you someone who is slow to open but reliable once you do — and who expects the same in return.",
+    },
   ]
   return combos.filter(c => c.when(profile)).slice(0, 3)
 }
@@ -466,6 +553,8 @@ const ARCHETYPES = [
       { fn: p => p.conflictStyle === 'direct', weight: 1 },
       { fn: p => p.identityCore === 'achiever', weight: 1 },
       { fn: p => p.agencyStyle === 'internal', weight: 1 },
+      { fn: p => p.empathyStyle === 'cognitive', weight: 1 },
+      { fn: p => p.riskStyle === 'calibrated', weight: 1 },
     ],
     portrait: 'You build systems before you build anything else. The framework matters as much as what it holds. You think in structures — and the most important structure you maintain is your own consistency.',
     shadow: 'The map can become more real than the territory. You may resist what doesn\'t fit the system, even when it should.',
@@ -482,6 +571,8 @@ const ARCHETYPES = [
       { fn: p => p.socialOrientation === 'independent', weight: 1 },
       { fn: p => p.agencyStyle === 'internal', weight: 1 },
       { fn: p => p.desireCore === 'security', weight: 1 },
+      { fn: p => p.riskStyle === 'calibrated', weight: 1 },
+      { fn: p => p.trustStyle === 'earned', weight: 1 },
     ],
     portrait: 'You see things as they are and move accordingly. Not cynical — accurate. You optimize because you understand the cost of not optimizing, and you\'ve paid it before.',
     shadow: 'What can\'t be measured can still matter enormously. The unmeasurable tends to get underweighted in your calculations.',
@@ -558,6 +649,8 @@ const ARCHETYPES = [
       { fn: p => ['relationships', 'friendship', 'home'].includes(p.attachmentCore), weight: 1 },
       { fn: p => p.identityCore === 'relational', weight: 1 },
       { fn: p => p.desireCore === 'connection', weight: 1 },
+      { fn: p => p.empathyStyle === 'affective', weight: 2 },
+      { fn: p => p.trustStyle === 'open', weight: 1 },
     ],
     portrait: 'You read rooms and people with unusual precision. You adapt not to disappear into the group but to meet it. You feel the weight of what\'s unsaid in almost every interaction.',
     shadow: 'Your attunement can become self-erasure. The thread of what you actually want can get lost in tracking everyone else.',
@@ -573,6 +666,8 @@ const ARCHETYPES = [
       { fn: p => p.valueSystem === 'contextual', weight: 1 },
       { fn: p => p.agencyStyle === 'collective', weight: 1 },
       { fn: p => p.desireCore === 'connection', weight: 1 },
+      { fn: p => p.empathyStyle === 'cognitive', weight: 1 },
+      { fn: p => p.trustStyle === 'contextual', weight: 1 },
     ],
     portrait: 'You translate between people. You understand multiple positions simultaneously and can articulate each one better than the person who holds it. You build bridges where others only see the gap.',
     shadow: 'You can delay necessary confrontation indefinitely in the name of keeping the peace. Some things need to be broken before they can be fixed.',
@@ -590,6 +685,8 @@ const ARCHETYPES = [
       { fn: p => ['home', 'relationships', 'promise'].includes(p.attachmentCore), weight: 1 },
       { fn: p => p.desireCore === 'security', weight: 1 },
       { fn: p => p.identityCore === 'relational', weight: 1 },
+      { fn: p => p.empathyStyle === 'contained', weight: 1 },
+      { fn: p => p.riskStyle === 'averse', weight: 1 },
     ],
     portrait: 'You are the person people return to. You provide stability without demanding credit for it. Your reliability is a kind of generosity that goes largely unnoticed — except by those who depend on it.',
     shadow: 'You can carry others\' weight until it becomes resentment. Stability for others can come at the cost of your own becoming.',
@@ -605,6 +702,8 @@ const ARCHETYPES = [
       { fn: p => p.socialOrientation === 'independent', weight: 2 },
       { fn: p => p.finalChoice === 'acceptance', weight: 1 },
       { fn: p => p.identityCore === 'experiential', weight: 1 },
+      { fn: p => p.empathyStyle === 'cognitive', weight: 1 },
+      { fn: p => p.trustStyle === 'earned', weight: 1 },
     ],
     portrait: 'You observe more than you act, and your observations are precise. You let things reveal themselves rather than forcing the reveal. You are often the most accurate person in the room — and sometimes the quietest.',
     shadow: 'Distance can look like wisdom when it\'s actually protection. Not all observation is detachment; some is avoidance.',
@@ -635,6 +734,8 @@ const ARCHETYPES = [
       { fn: p => p.attention === 'scattered', weight: 2 },
       { fn: p => p.identityCore === 'experiential', weight: 1 },
       { fn: p => p.agencyStyle === 'contextual', weight: 1 },
+      { fn: p => p.riskStyle === 'tolerant', weight: 1 },
+      { fn: p => p.trustStyle === 'open', weight: 1 },
     ],
     portrait: 'You move through the world collecting experience, perspective, and encounter. You are not lost — you have simply not decided to arrive. Each phase feels complete on its own terms.',
     shadow: 'Range without depth can become a pattern of beginning without finishing.',
@@ -652,7 +753,7 @@ export function computeArchetype(profile) {
 
 export function computeCycleMeta(cycleHistory, currentProfile) {
   if (!cycleHistory.length || !currentProfile) return null
-  const dims = ['mindType', 'valueSystem', 'attention', 'biasAwareness', 'socialOrientation', 'attachmentCore', 'mortalityStyle', 'conflictStyle', 'timeOrientation', 'identityCore', 'agencyStyle', 'desireCore']
+  const dims = ['mindType', 'valueSystem', 'attention', 'biasAwareness', 'socialOrientation', 'attachmentCore', 'mortalityStyle', 'conflictStyle', 'timeOrientation', 'identityCore', 'agencyStyle', 'desireCore', 'empathyStyle', 'riskStyle', 'trustStyle']
   const all  = [...cycleHistory.map(h => h.profile), currentProfile]
   return dims.map(dim => {
     const values    = all.map(p => p[dim])
@@ -848,6 +949,33 @@ function gameReducer(state, action) {
         },
       }
 
+    case 'TRACK_EMPATHY':
+      return {
+        ...state,
+        tracking: {
+          ...state.tracking,
+          empathy: { answers: [...state.tracking.empathy.answers, action.answer] },
+        },
+      }
+
+    case 'TRACK_RISK':
+      return {
+        ...state,
+        tracking: {
+          ...state.tracking,
+          risk: { answers: [...state.tracking.risk.answers, action.answer] },
+        },
+      }
+
+    case 'TRACK_TRUST':
+      return {
+        ...state,
+        tracking: {
+          ...state.tracking,
+          trust: { answers: [...state.tracking.trust.answers, action.answer] },
+        },
+      }
+
     case 'TRACK_FINAL_CHOICE': {
       const tracking = { ...state.tracking, detachment: { finalChoice: action.choice } }
       return { ...state, tracking, profile: computeProfile(tracking), screen: 'profile' }
@@ -862,7 +990,7 @@ function gameReducer(state, action) {
 }
 
 const GameContext = createContext(null)
-const STORAGE_KEY = 'echo_state_v4'
+const STORAGE_KEY = 'echo_state_v5'
 
 export function GameProvider({ children }) {
   const [state, dispatch] = useReducer(
