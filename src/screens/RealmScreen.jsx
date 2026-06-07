@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useGame, REALMS } from '../context/GameContext.jsx'
-import { tapMedium } from '../lib/haptics.js'
+import { tapLight, tapMedium } from '../lib/haptics.js'
 import NatureRealm      from '../realms/NatureRealm.jsx'
 import AbstractionRealm from '../realms/AbstractionRealm.jsx'
 import PerceptionRealm  from '../realms/PerceptionRealm.jsx'
@@ -37,7 +37,7 @@ const COMPONENTS = [
   DetachmentRealm,
 ]
 
-function RealmIntro({ realm, onEnter }) {
+function RealmIntro({ realm, onEnter, isReturning }) {
   const [visible, setVisible] = useState(false)
   const [subVisible, setSubVisible] = useState(false)
   const [btnVisible, setBtnVisible] = useState(false)
@@ -85,13 +85,19 @@ function RealmIntro({ realm, onEnter }) {
         <button onClick={() => { tapMedium(); onEnter() }} className="btn-realm mono tracking-widest uppercase text-sm">
           BEGIN
         </button>
+        {isReturning && (
+          <button onClick={() => { tapLight(); onEnter() }}
+            className="mono text-xs text-slate-700 text-center w-full pt-3 underline underline-offset-2">
+            skip intro
+          </button>
+        )}
       </div>
     </div>
   )
 }
 
 export default function RealmScreen() {
-  const { currentRealm } = useGame()
+  const { currentRealm, cycleCount } = useGame()
   const [introShown, setIntroShown] = useState(false)
 
   // Reset intro when realm changes
@@ -145,7 +151,7 @@ export default function RealmScreen() {
       {/* Body — intro card or realm content */}
       <div className="relative z-10 flex-1 flex flex-col px-6 pb-8">
         {!introShown ? (
-          <RealmIntro realm={realm} onEnter={() => setIntroShown(true)} />
+          <RealmIntro realm={realm} onEnter={() => setIntroShown(true)} isReturning={cycleCount > 0} />
         ) : (
           <div className="animate-fade-in">
             <ActiveRealm />

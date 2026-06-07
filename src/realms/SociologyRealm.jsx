@@ -30,8 +30,8 @@ const VARIANTS = [
 ]
 
 export default function SociologyRealm() {
-  const { dispatch, cycleCount, tracking } = useGame()
-  const rounds = VARIANTS[cycleCount % VARIANTS.length]
+  const { dispatch, variantSeed, tracking } = useGame()
+  const rounds = VARIANTS[variantSeed % VARIANTS.length]
   const [roundIndex, setRoundIndex] = useState(0)
   const [selected,   setSelected]   = useState(null)
   const [canTap,     setCanTap]     = useState(true)

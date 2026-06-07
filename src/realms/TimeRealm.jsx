@@ -132,8 +132,8 @@ const VARIANTS = [
 ]
 
 export default function TimeRealm() {
-  const { dispatch, cycleCount } = useGame()
-  const variant = VARIANTS[cycleCount % VARIANTS.length]
+  const { dispatch, variantSeed } = useGame()
+  const variant = VARIANTS[variantSeed % VARIANTS.length]
 
   const [index,    setIndex]    = useState(0)
   const [selected, setSelected] = useState(null)

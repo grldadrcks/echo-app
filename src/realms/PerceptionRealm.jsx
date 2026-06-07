@@ -65,8 +65,8 @@ const VARIANTS = [
 ]
 
 export default function PerceptionRealm() {
-  const { dispatch, cycleCount } = useGame()
-  const v = VARIANTS[cycleCount % VARIANTS.length]
+  const { dispatch, variantSeed } = useGame()
+  const v = VARIANTS[variantSeed % VARIANTS.length]
 
   const [phase,          setPhase]          = useState('attention')
   const [attentionAns,   setAttentionAns]   = useState(null)

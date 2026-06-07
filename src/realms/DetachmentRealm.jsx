@@ -30,17 +30,26 @@ const INTRO_VARIANTS = [
 ]
 
 function RadarChart({ profile }) {
-  const SIZE   = 240
+  const SIZE   = 280
   const CENTER = SIZE / 2
   const RADIUS = 84
 
   const scores = {
-    Mind:       profile.mindType      === 'balanced'    ? 0.5 : profile.mindType      === 'analytical'  ? 0.9 : 0.25,
-    Values:     profile.valueSystem   === 'principled'  ? 0.9 : profile.valueSystem   === 'contextual'  ? 0.55 : 0.3,
-    Attention:  profile.attention     === 'focused'     ? 0.9 : profile.attention     === 'selective'   ? 0.6 : 0.25,
-    Awareness:  profile.biasAwareness === 'high'        ? 0.9 : profile.biasAwareness === 'moderate'   ? 0.55 : 0.2,
-    Social:     profile.socialOrientation === 'independent' ? 0.9 : profile.socialOrientation === 'adaptive' ? 0.55 : 0.25,
-    Attachment: profile.attachmentCore === 'wounds'     ? 0.3 : profile.attachmentCore === 'future'    ? 0.6 : 0.85,
+    MIND:   profile.mindType === 'balanced' ? 0.5 : profile.mindType === 'analytical' ? 0.9 : 0.25,
+    VALS:   profile.valueSystem === 'principled' ? 0.9 : profile.valueSystem === 'contextual' ? 0.55 : 0.3,
+    ATTN:   profile.attention === 'focused' ? 0.9 : profile.attention === 'selective' ? 0.6 : 0.25,
+    AWARE:  profile.biasAwareness === 'high' ? 0.9 : profile.biasAwareness === 'moderate' ? 0.55 : 0.2,
+    SOCIAL: profile.socialOrientation === 'independent' ? 0.9 : profile.socialOrientation === 'adaptive' ? 0.55 : 0.25,
+    ATTCH:  profile.attachmentCore === 'wounds' ? 0.3 : profile.attachmentCore === 'future' ? 0.6 : 0.85,
+    MORT:   profile.mortalityStyle === 'legacy' ? 0.9 : profile.mortalityStyle === 'present' ? 0.55 : 0.2,
+    CONF:   profile.conflictStyle === 'direct' ? 0.9 : profile.conflictStyle === 'diplomatic' ? 0.55 : 0.2,
+    TIME:   profile.timeOrientation === 'future' ? 0.9 : profile.timeOrientation === 'present' ? 0.55 : 0.25,
+    IDNT:   profile.identityCore === 'achiever' ? 0.9 : profile.identityCore === 'relational' ? 0.6 : 0.3,
+    AGCY:   profile.agencyStyle === 'internal' ? 0.9 : profile.agencyStyle === 'contextual' ? 0.55 : 0.25,
+    DESIR:  profile.desireCore === 'growth' ? 0.9 : profile.desireCore === 'connection' ? 0.55 : 0.2,
+    EMPT:   profile.empathyStyle === 'affective' ? 0.9 : profile.empathyStyle === 'cognitive' ? 0.55 : 0.2,
+    RISK:   profile.riskStyle === 'tolerant' ? 0.9 : profile.riskStyle === 'calibrated' ? 0.55 : 0.2,
+    TRUST:  profile.trustStyle === 'open' ? 0.9 : profile.trustStyle === 'contextual' ? 0.55 : 0.25,
   }
 
   const axes = Object.keys(scores)
@@ -70,14 +79,14 @@ function RadarChart({ profile }) {
           stroke="var(--realm-accent)" strokeWidth="1.5" strokeLinejoin="round" />
         {axes.map((ax, i) => {
           const p = pt(i, scores[ax])
-          return <circle key={ax} cx={p.x} cy={p.y} r="3.5" fill="var(--realm-accent)" stroke="#000" strokeWidth="1.5" />
+          return <circle key={ax} cx={p.x} cy={p.y} r="3" fill="var(--realm-accent)" stroke="#000" strokeWidth="1.5" />
         })}
         {axes.map((ax, i) => {
-          const lp = pt(i, 1.3)
+          const lp = pt(i, 1.32)
           return (
             <text key={ax} x={lp.x} y={lp.y} textAnchor="middle" dominantBaseline="middle"
-              fill="rgba(255,255,255,0.4)" fontSize="8.5" fontFamily="'Courier New', monospace" letterSpacing="0.06em">
-              {ax.toUpperCase()}
+              fill="rgba(255,255,255,0.4)" fontSize="7" fontFamily="'Courier New', monospace" letterSpacing="0.05em">
+              {ax}
             </text>
           )
         })}

@@ -51,8 +51,8 @@ const VARIANTS = [
 ]
 
 export default function AttachmentRealm() {
-  const { dispatch, cycleCount } = useGame()
-  const v = VARIANTS[cycleCount % VARIANTS.length]
+  const { dispatch, variantSeed } = useGame()
+  const v = VARIANTS[variantSeed % VARIANTS.length]
 
   const [anchors,   setAnchors]   = useState(v.anchors)
   const [round,     setRound]     = useState(0)

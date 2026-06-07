@@ -10,6 +10,7 @@ export const REALMS = [
     introSub: 'So do you.',
     debrief: 'Patterns observed.',
     debriefSub: 'How you recognize order says something about how your mind moves.',
+    observe: 'How quickly your mind closes on a pattern.',
   },
   {
     id: 'abstraction',
@@ -20,6 +21,7 @@ export const REALMS = [
     introSub: 'How you respond to them does.',
     debrief: 'Your reasoning has been mapped.',
     debriefSub: 'The logic you reach for reveals the values you carry.',
+    observe: 'Whether you optimize outcomes, honor rules, or reason from context.',
   },
   {
     id: 'perception',
@@ -30,6 +32,7 @@ export const REALMS = [
     introSub: 'This stratum tests what you miss.',
     debrief: 'Your attention has a shape.',
     debriefSub: 'What you notice — and what you don\'t — is a signature.',
+    observe: 'What your attention catches — and what it systematically misses.',
   },
   {
     id: 'psychology',
@@ -40,6 +43,7 @@ export const REALMS = [
     introSub: 'Observe whether yours does.',
     debrief: 'Your biases have been recorded.',
     debriefSub: 'Self-awareness is measured not by knowing about bias, but by moving when you see it.',
+    observe: 'Whether confronting a bias was enough to move you.',
   },
   {
     id: 'sociology',
@@ -50,6 +54,7 @@ export const REALMS = [
     introSub: 'See how much that changes you.',
     debrief: 'Your social gravity has been measured.',
     debriefSub: 'The pull of the group is invisible until you notice you\'ve moved.',
+    observe: 'How much the stated majority changed what you chose.',
   },
   {
     id: 'attachment',
@@ -60,6 +65,7 @@ export const REALMS = [
     introSub: 'This stratum asks what you will not let go.',
     debrief: 'What you held longest has been noted.',
     debriefSub: 'The last thing you release is the thing that defines you.',
+    observe: 'What you were unwilling to release.',
   },
   {
     id: 'mortality',
@@ -70,6 +76,7 @@ export const REALMS = [
     introSub: 'This stratum measures what that does to you.',
     debrief: 'Your relationship with finitude has been recorded.',
     debriefSub: 'How you hold the limit says everything about how you use what\'s inside it.',
+    observe: 'Whether you lean into the limit, sit within it, or hold it at distance.',
   },
   {
     id: 'conflict',
@@ -80,6 +87,7 @@ export const REALMS = [
     introSub: 'This stratum watches how you move through it.',
     debrief: 'Your conflict signature has been mapped.',
     debriefSub: 'How you navigate resistance is the shape of your will.',
+    observe: 'How close you let friction get before responding.',
   },
   {
     id: 'time',
@@ -90,6 +98,7 @@ export const REALMS = [
     introSub: 'This stratum finds your center of gravity.',
     debrief: 'Your temporal orientation has been recorded.',
     debriefSub: 'Past, present, or future — your center of gravity shapes how you move.',
+    observe: 'Where your center of gravity lives — past, present, or future.',
   },
   {
     id: 'identity',
@@ -100,6 +109,7 @@ export const REALMS = [
     introSub: 'This stratum asks where that story comes from.',
     debrief: 'Your self-concept has been mapped.',
     debriefSub: 'Where you locate yourself — in achievement, in others, or in your own inner life — shapes everything.',
+    observe: 'What you most locate your sense of self in.',
   },
   {
     id: 'agency',
@@ -110,6 +120,7 @@ export const REALMS = [
     introSub: 'This stratum asks who you believe is the author.',
     debrief: 'Your relationship to causation has been recorded.',
     debriefSub: 'Whether you see yourself as author, navigator, or participant shapes every decision you make.',
+    observe: 'Whether you see yourself as author, navigator, or participant.',
   },
   {
     id: 'desire',
@@ -120,6 +131,7 @@ export const REALMS = [
     introSub: 'This stratum finds the one that runs deepest.',
     debrief: 'What you are ultimately seeking has been noted.',
     debriefSub: 'Security, connection, or growth — the deepest desire shapes everything above it.',
+    observe: 'What you are, at the deepest level, reaching for.',
   },
   {
     id: 'empathy',
@@ -130,6 +142,7 @@ export const REALMS = [
     introSub: 'This stratum asks how much you let them in.',
     debrief: 'Your empathic style has been recorded.',
     debriefSub: 'How you take in others\' inner experience shapes every relationship you have.',
+    observe: 'How other people\'s inner experience reaches you.',
   },
   {
     id: 'risk',
@@ -140,6 +153,7 @@ export const REALMS = [
     introSub: 'This stratum measures how you move through that.',
     debrief: 'Your relationship to uncertainty has been mapped.',
     debriefSub: 'Whether you lean toward the unknown or away from it is one of the most consistent things about you.',
+    observe: 'Your relationship to uncertainty when something real is at stake.',
   },
   {
     id: 'trust',
@@ -150,6 +164,7 @@ export const REALMS = [
     introSub: 'This stratum asks what you do instead.',
     debrief: 'Your trust orientation has been noted.',
     debriefSub: 'How you extend trust — freely, carefully, or situationally — reveals your deepest assumptions about people.',
+    observe: 'What you require before you open.',
   },
   {
     id: 'detachment',
@@ -169,6 +184,7 @@ const INITIAL_STATE = {
   realmPhase: 0,
   pendingRealm: null,
   cycleCount: 0,
+  variantSeed: 0,
   cycleHistory: [],
   tracking: {
     nature:      { responseTimes: [], rushCount: 0, pauseCount: 0 },
@@ -743,12 +759,16 @@ const ARCHETYPES = [
   },
 ]
 
-export function computeArchetype(profile) {
+export function computeArchetypes(profile) {
   const scored = ARCHETYPES.map(a => ({
     ...a,
     score: a.criteria.reduce((s, c) => s + (c.fn(profile) ? c.weight : 0), 0),
   }))
-  return scored.sort((a, b) => b.score - a.score)[0]
+  return scored.sort((a, b) => b.score - a.score)
+}
+
+export function computeArchetype(profile) {
+  return computeArchetypes(profile)[0]
 }
 
 export function computeCycleMeta(cycleHistory, currentProfile) {
@@ -763,6 +783,119 @@ export function computeCycleMeta(cycleHistory, currentProfile) {
   })
 }
 
+export function generateContradictions(profile) {
+  const pairs = [
+    {
+      when: p => p.agencyStyle === 'internal' && p.conflictStyle === 'avoidant',
+      text: "You hold yourself as the primary author of outcomes — but step back from friction. Authorship without confrontation is a claim you don't always collect on.",
+    },
+    {
+      when: p => p.socialOrientation === 'conformist' && p.valueSystem === 'principled',
+      text: "You hold firm principles but moved with the majority. These two will eventually pull in opposite directions — and which one yields will tell you which one is real.",
+    },
+    {
+      when: p => p.mindType === 'analytical' && p.riskStyle === 'tolerant',
+      text: "You dissect carefully but move into uncertainty readily. Most people who analyze as deeply as you do use that analysis to reduce risk — not to justify taking it.",
+    },
+    {
+      when: p => p.trustStyle === 'open' && p.conflictStyle === 'avoidant',
+      text: "You extend trust freely but avoid friction. Open trust without the willingness to address betrayal directly is trust without an enforcement mechanism.",
+    },
+    {
+      when: p => p.desireCore === 'growth' && p.riskStyle === 'averse',
+      text: "You most fundamentally want to keep becoming — but weight downside heavily before acting. Growth that avoids risk tends to stay theoretical.",
+    },
+    {
+      when: p => p.identityCore === 'achiever' && p.timeOrientation === 'present',
+      text: "You locate yourself in what you build but live in the present. Achievement is inherently future-oriented — you may be more grounded than your ambitions account for.",
+    },
+    {
+      when: p => p.empathyStyle === 'affective' && p.socialOrientation === 'independent',
+      text: "You feel others' experience directly but resist the pull of the group. You absorb people one at a time while rejecting them as a collective — a distinction most people around you won't recognize.",
+    },
+    {
+      when: p => p.mortalityStyle === 'avoidant' && p.desireCore === 'growth',
+      text: "You keep the limit at arm's length but most fundamentally want to keep becoming. Growth without confronting finitude tends to be directionless — there is no deadline driving the becoming.",
+    },
+    {
+      when: p => p.agencyStyle === 'collective' && p.socialOrientation === 'independent',
+      text: "You believe outcomes emerge through collective alignment but resist the pull of the group. You want collaboration without conformity — a narrow gate that requires constant navigation.",
+    },
+    {
+      when: p => p.timeOrientation === 'future' && ['past_self', 'wounds', 'failure'].includes(p.attachmentCore),
+      text: "You live ahead of yourself but held on to the past. You are building toward a future version while the past remains the reference point — two orientations in quiet competition.",
+    },
+    {
+      when: p => p.valueSystem === 'utilitarian' && ['wounds', 'failure'].includes(p.attachmentCore),
+      text: "You optimize for outcomes but held onto a wound. Pure outcome-focus would have released it as unproductive — which means something in you knows the wound is doing work that defies the calculus.",
+    },
+    {
+      when: p => p.biasAwareness === 'high' && p.riskStyle === 'averse',
+      text: "You moved when shown the mechanism of your own bias — but weight downside heavily. High self-awareness and risk aversion together can produce sophisticated reasons to stay still.",
+    },
+    {
+      when: p => p.identityCore === 'relational' && p.trustStyle === 'earned',
+      text: "You know yourself through others but require trust to be demonstrated before extending it. Your deepest source of self depends on exactly what you are slowest to allow.",
+    },
+    {
+      when: p => p.mortalityStyle === 'legacy' && p.timeOrientation === 'present',
+      text: "You orient toward what outlasts you but live fully in the present. Legacy-building usually requires sacrificing present comfort for future impact — you may be attempting both simultaneously.",
+    },
+    {
+      when: p => p.socialOrientation === 'independent' && p.desireCore === 'connection',
+      text: "You resist the pull of the group but most fundamentally want to be truly known. Independence and deep connection are both real — but they require different postures, and switching between them costs something.",
+    },
+    {
+      when: p => p.conflictStyle === 'avoidant' && p.mortalityStyle === 'legacy',
+      text: "You avoid friction but orient toward legacy — toward something that outlasts you. Most forms of lasting impact require someone to push back, and you tend to step around that moment.",
+    },
+    {
+      when: p => p.conflictStyle === 'direct' && p.trustStyle === 'open',
+      text: "You move toward friction and extend trust freely. That combination creates intense closeness fast — and fast closeness creates the conditions for significant betrayal.",
+    },
+  ]
+  return pairs.filter(c => c.when(profile)).slice(0, 2)
+}
+
+export function generateArchetypeShift(fromId, toId) {
+  if (!fromId || !toId || fromId === toId) return null
+  const SHIFTS = {
+    'architect→seeker':    'from building frameworks toward questioning them',
+    'architect→navigator': 'from fixed principles toward contextual reading',
+    'architect→idealist':  'from disciplined structure toward visionary conviction',
+    'architect→forge':     'from careful architecture toward direct force',
+    'architect→wanderer':  'from structure toward open movement',
+    'realist→idealist':    'from outcome-optimization toward principled vision',
+    'realist→navigator':   'from calculating outcomes toward reading rooms',
+    'realist→seeker':      'from pragmatism toward open inquiry',
+    'seeker→anchor':       'from open-ended questioning toward rootedness',
+    'seeker→architect':    'from questioning toward building',
+    'seeker→guardian':     "from chasing what's new toward protecting what shaped you",
+    'seeker→realist':      'from open inquiry toward pragmatic ground',
+    'forge→diplomat':      'from moving through friction toward navigating around it',
+    'forge→architect':     'from raw force toward deliberate structure',
+    'forge→witness':       'from direct impact toward careful observation',
+    'empath→witness':      'from absorbing others toward observing them',
+    'empath→diplomat':     'from feeling the room toward translating it',
+    'diplomat→forge':      'from careful navigation toward direct action',
+    'diplomat→architect':  'from flexible translation toward principled structure',
+    'anchor→seeker':       'from stable ground toward open horizon',
+    'anchor→wanderer':     'from being the foundation toward following the current',
+    'witness→forge':       'from watching toward acting',
+    'witness→architect':   'from observing systems toward building them',
+    'guardian→seeker':     "from protecting what shaped you toward seeking what's next",
+    'guardian→navigator':  'from principle toward pragmatic flexibility',
+    'wanderer→anchor':     'from moving through the world toward becoming the ground',
+    'wanderer→architect':  'from open experience toward deliberate structure',
+    'idealist→realist':    'from principled vision toward pragmatic outcomes',
+    'idealist→navigator':  'from fixed conviction toward situational judgment',
+    'navigator→architect': 'from reading contexts toward building systems',
+    'navigator→seeker':    'from translating between positions toward moving beyond them',
+  }
+  const phrase = SHIFTS[`${fromId}→${toId}`]
+  return phrase ? `You moved ${phrase}.` : `You moved from ${fromId} toward ${toId}.`
+}
+
 function gameReducer(state, action) {
   switch (action.type) {
 
@@ -773,6 +906,7 @@ function gameReducer(state, action) {
         currentRealm: 0,
         realmPhase: 0,
         pendingRealm: null,
+        variantSeed: 0,
         tracking: freshTracking(),
         profile: null,
       }
@@ -805,6 +939,7 @@ function gameReducer(state, action) {
         pendingRealm: null,
         cycleCount: state.cycleCount + 1,
         cycleHistory: newHistory,
+        variantSeed: Math.floor(Math.random() * 9999),
         tracking: freshTracking(),
         profile: null,
       }
@@ -999,7 +1134,8 @@ export function GameProvider({ children }) {
     () => {
       try {
         const saved = localStorage.getItem(STORAGE_KEY)
-        return saved ? JSON.parse(saved) : INITIAL_STATE
+        if (!saved) return INITIAL_STATE
+        return { ...INITIAL_STATE, ...JSON.parse(saved) }
       } catch {
         return INITIAL_STATE
       }

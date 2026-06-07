@@ -65,6 +65,12 @@ export default function TransitionScreen() {
           </h2>
           <p className="text-slate-300 text-base leading-relaxed">{completedRealm.debrief}</p>
           <p className="text-slate-500 text-sm leading-relaxed mt-2">{completedRealm.debriefSub}</p>
+          {completedRealm.observe && (
+            <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <p className="mono text-xs text-slate-700 mb-1 tracking-widest">WE OBSERVED</p>
+              <p className="text-slate-500 text-sm leading-relaxed italic">{completedRealm.observe}</p>
+            </div>
+          )}
         </div>
 
         {/* Divider */}

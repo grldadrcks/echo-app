@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useGame, generateNarrative, generateSynthesis, computeCycleMeta, computeArchetype, REALMS } from '../context/GameContext.jsx'
+import { useGame, generateNarrative, generateSynthesis, generateContradictions, generateArchetypeShift, computeCycleMeta, computeArchetype, computeArchetypes, REALMS } from '../context/GameContext.jsx'
 
 const DIM_LABELS = {
   mindType:          { label: 'MIND TYPE',  map: { intuitive: 'Intuitive', analytical: 'Analytical', balanced: 'Balanced' } },
@@ -19,21 +19,68 @@ const DIM_LABELS = {
   trustStyle:        { label: 'TRUST',      map: { open: 'Open', earned: 'Earned', contextual: 'Contextual' } },
 }
 
-function RadarChart({ profile, size = 220 }) {
-  const CENTER = size / 2
-  const RADIUS = size * 0.355
+const LABEL_TO_DIM = {
+  'Mind':       { dim: 'mindType',          realmLabel: 'NATURE'      },
+  'Values':     { dim: 'valueSystem',       realmLabel: 'ABSTRACTION' },
+  'Attention':  { dim: 'attention',         realmLabel: 'PERCEPTION'  },
+  'Awareness':  { dim: 'biasAwareness',     realmLabel: 'PSYCHOLOGY'  },
+  'Social':     { dim: 'socialOrientation', realmLabel: 'SOCIOLOGY'   },
+  'Attachment': { dim: 'attachmentCore',    realmLabel: 'ATTACHMENT'  },
+  'Mortality':  { dim: 'mortalityStyle',    realmLabel: 'MORTALITY'   },
+  'Conflict':   { dim: 'conflictStyle',     realmLabel: 'CONFLICT'    },
+  'Time':       { dim: 'timeOrientation',   realmLabel: 'TIME'        },
+  'Identity':   { dim: 'identityCore',      realmLabel: 'IDENTITY'    },
+  'Agency':     { dim: 'agencyStyle',       realmLabel: 'AGENCY'      },
+  'Desire':     { dim: 'desireCore',        realmLabel: 'DESIRE'      },
+  'Empathy':    { dim: 'empathyStyle',      realmLabel: 'EMPATHY'     },
+  'Risk':       { dim: 'riskStyle',         realmLabel: 'RISK'        },
+  'Trust':      { dim: 'trustStyle',        realmLabel: 'TRUST'       },
+}
 
-  const scores = {
-    Mind:       profile.mindType      === 'balanced'    ? 0.5 : profile.mindType      === 'analytical'  ? 0.9 : 0.25,
-    Values:     profile.valueSystem   === 'principled'  ? 0.9 : profile.valueSystem   === 'contextual'  ? 0.55 : 0.3,
-    Attention:  profile.attention     === 'focused'     ? 0.9 : profile.attention     === 'selective'   ? 0.6 : 0.25,
-    Awareness:  profile.biasAwareness === 'high'        ? 0.9 : profile.biasAwareness === 'moderate'   ? 0.55 : 0.2,
-    Social:     profile.socialOrientation === 'independent' ? 0.9 : profile.socialOrientation === 'adaptive' ? 0.55 : 0.25,
-    Attachment: profile.attachmentCore === 'wounds'     ? 0.3 : profile.attachmentCore === 'future'    ? 0.6 : 0.85,
+const NARRATIVE_ACCENTS = {
+  'Mind':       { accent: '#2d6a4f', rgb: '45,106,79'   },
+  'Values':     { accent: '#4338ca', rgb: '67,56,202'   },
+  'Attention':  { accent: '#b45309', rgb: '180,83,9'    },
+  'Awareness':  { accent: '#be123c', rgb: '190,18,60'   },
+  'Social':     { accent: '#1d4ed8', rgb: '29,78,216'   },
+  'Attachment': { accent: '#7c3aed', rgb: '124,58,237'  },
+  'Mortality':  { accent: '#475569', rgb: '71,85,105'   },
+  'Conflict':   { accent: '#dc2626', rgb: '220,38,38'   },
+  'Time':       { accent: '#0891b2', rgb: '8,145,178'   },
+  'Identity':   { accent: '#0e7490', rgb: '14,116,144'  },
+  'Agency':     { accent: '#15803d', rgb: '21,128,61'   },
+  'Desire':     { accent: '#86198f', rgb: '134,25,143'  },
+  'Empathy':    { accent: '#059669', rgb: '5,150,105'   },
+  'Risk':       { accent: '#ea580c', rgb: '234,88,12'   },
+  'Trust':      { accent: '#7e22ce', rgb: '126,34,206'  },
+}
+
+function radarScores(profile) {
+  return {
+    MIND:   profile.mindType === 'balanced' ? 0.5 : profile.mindType === 'analytical' ? 0.9 : 0.25,
+    VALS:   profile.valueSystem === 'principled' ? 0.9 : profile.valueSystem === 'contextual' ? 0.55 : 0.3,
+    ATTN:   profile.attention === 'focused' ? 0.9 : profile.attention === 'selective' ? 0.6 : 0.25,
+    AWARE:  profile.biasAwareness === 'high' ? 0.9 : profile.biasAwareness === 'moderate' ? 0.55 : 0.2,
+    SOCIAL: profile.socialOrientation === 'independent' ? 0.9 : profile.socialOrientation === 'adaptive' ? 0.55 : 0.25,
+    ATTCH:  profile.attachmentCore === 'wounds' ? 0.3 : profile.attachmentCore === 'future' ? 0.6 : 0.85,
+    MORT:   profile.mortalityStyle === 'legacy' ? 0.9 : profile.mortalityStyle === 'present' ? 0.55 : 0.2,
+    CONF:   profile.conflictStyle === 'direct' ? 0.9 : profile.conflictStyle === 'diplomatic' ? 0.55 : 0.2,
+    TIME:   profile.timeOrientation === 'future' ? 0.9 : profile.timeOrientation === 'present' ? 0.55 : 0.25,
+    IDNT:   profile.identityCore === 'achiever' ? 0.9 : profile.identityCore === 'relational' ? 0.6 : 0.3,
+    AGCY:   profile.agencyStyle === 'internal' ? 0.9 : profile.agencyStyle === 'contextual' ? 0.55 : 0.25,
+    DESIR:  profile.desireCore === 'growth' ? 0.9 : profile.desireCore === 'connection' ? 0.55 : 0.2,
+    EMPT:   profile.empathyStyle === 'affective' ? 0.9 : profile.empathyStyle === 'cognitive' ? 0.55 : 0.2,
+    RISK:   profile.riskStyle === 'tolerant' ? 0.9 : profile.riskStyle === 'calibrated' ? 0.55 : 0.2,
+    TRUST:  profile.trustStyle === 'open' ? 0.9 : profile.trustStyle === 'contextual' ? 0.55 : 0.25,
   }
+}
 
-  const axes = Object.keys(scores)
-  const N    = axes.length
+function RadarChart({ profile, size = 260 }) {
+  const CENTER = size / 2
+  const RADIUS = size * 0.32
+  const scores = radarScores(profile)
+  const axes   = Object.keys(scores)
+  const N      = axes.length
 
   function pt(i, v) {
     const angle = (Math.PI * 2 * i) / N - Math.PI / 2
@@ -42,6 +89,7 @@ function RadarChart({ profile, size = 220 }) {
 
   const dataPoints = axes.map((ax, i) => pt(i, scores[ax]))
   const dataPath   = dataPoints.map(p => `${p.x},${p.y}`).join(' ')
+  const fontSize   = Math.max(6, size * 0.032)
 
   return (
     <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size} style={{ overflow: 'visible' }}>
@@ -58,18 +106,45 @@ function RadarChart({ profile, size = 220 }) {
         fill="rgba(var(--realm-accent-rgb), 0.12)"
         stroke="var(--realm-accent)" strokeWidth="1.5" strokeLinejoin="round" />
       {dataPoints.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r="3.5" fill="var(--realm-accent)" stroke="#000" strokeWidth="1.5" />
+        <circle key={i} cx={p.x} cy={p.y} r="3" fill="var(--realm-accent)" stroke="#000" strokeWidth="1.5" />
       ))}
       {axes.map((ax, i) => {
-        const lp = pt(i, 1.32)
+        const lp = pt(i, 1.34)
         return (
           <text key={ax} x={lp.x} y={lp.y} textAnchor="middle" dominantBaseline="middle"
-            fill="rgba(255,255,255,0.38)" fontSize={size < 200 ? 7 : 8.5}
+            fill="rgba(255,255,255,0.38)" fontSize={fontSize}
             fontFamily="'Courier New', monospace" letterSpacing="0.05em">
-            {ax.toUpperCase()}
+            {ax}
           </text>
         )
       })}
+    </svg>
+  )
+}
+
+function MiniRadar({ profile }) {
+  const SIZE = 100, CENTER = 50, RADIUS = 32
+  const scores = radarScores(profile)
+  const axes   = Object.keys(scores).slice(0, 6)
+  const N      = axes.length
+
+  function pt(i, v) {
+    const angle = (Math.PI * 2 * i) / N - Math.PI / 2
+    return { x: CENTER + RADIUS * v * Math.cos(angle), y: CENTER + RADIUS * v * Math.sin(angle) }
+  }
+
+  const dataPath = axes.map((ax, i) => { const p = pt(i, scores[ax]); return `${p.x},${p.y}` }).join(' ')
+
+  return (
+    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} width={SIZE} height={SIZE}>
+      {[0.5, 1].map(ring => (
+        <polygon key={ring}
+          points={axes.map((_, i) => { const p = pt(i, ring); return `${p.x},${p.y}` }).join(' ')}
+          fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+      ))}
+      <polygon points={dataPath}
+        fill="rgba(var(--realm-accent-rgb), 0.12)"
+        stroke="var(--realm-accent)" strokeWidth="1" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -87,7 +162,7 @@ function ShareCard({ profile }) {
           <p className="mono text-xs text-slate-600 tracking-widest">ECHO</p>
           <p className="mono font-bold text-lg tracking-widest" style={{ color: 'var(--realm-accent)' }}>YOUR PATTERN</p>
         </div>
-        <RadarChart profile={profile} size={100} />
+        <MiniRadar profile={profile} />
       </div>
       <div className="grid grid-cols-2 gap-2">
         {dims.slice(0, 6).map(([key, meta]) => (
@@ -130,6 +205,44 @@ function CycleHistory({ meta, cycleHistory, currentProfile }) {
         className="rounded-2xl p-4"
         style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}
       >
+        {/* Archetype timeline */}
+        <div className="mb-4 pb-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <p className="mono text-xs text-slate-600 tracking-widest mb-2">ARCHETYPE</p>
+          <div className="flex flex-wrap gap-2">
+            {allCycles.map((c, i) => {
+              const at = computeArchetype(c.profile)
+              const isCurrent = i === allCycles.length - 1
+              return (
+                <div key={i} className="rounded-lg px-2.5 py-1.5"
+                  style={{
+                    background: isCurrent ? 'rgba(var(--realm-accent-rgb), 0.1)' : 'rgba(255,255,255,0.03)',
+                    border: `1px solid ${isCurrent ? 'rgba(var(--realm-accent-rgb), 0.25)' : 'rgba(255,255,255,0.07)'}`,
+                  }}>
+                  <p className="mono text-xs text-slate-600">{isCurrent ? 'NOW' : `#${i + 1}`}</p>
+                  <p className="mono text-xs font-semibold" style={{ color: isCurrent ? 'var(--realm-accent)' : '#64748b' }}>
+                    {at.name.replace('The ', '')}
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+          {allCycles.length >= 2 && (
+            <div className="mt-2 space-y-1">
+              {allCycles.slice(1).map((c, i) => {
+                const fromAt = computeArchetype(allCycles[i].profile)
+                const toAt   = computeArchetype(c.profile)
+                const shift  = generateArchetypeShift(fromAt.id, toAt.id)
+                if (!shift) return null
+                return (
+                  <p key={i} className="mono text-xs text-slate-600 italic leading-relaxed">
+                    {shift}
+                  </p>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
         <p className="text-slate-500 text-xs leading-relaxed mb-4">
           {consistentCount === meta.length
             ? 'Your pattern is consistent across all cycles. These traits run deep.'
@@ -180,11 +293,16 @@ export default function ProfileScreen() {
   const [showRestart,   setShowRestart]   = useState(false)
   const [descending,    setDescending]    = useState(false)
   const [copied,        setCopied]        = useState(false)
+  const [expandedCard,  setExpandedCard]  = useState(null)
+  const [allRevealed,   setAllRevealed]   = useState(false)
 
-  const narrative  = profile ? generateNarrative(profile) : []
-  const synthesis  = profile ? generateSynthesis(profile) : []
-  const cycleMeta  = computeCycleMeta(cycleHistory, profile)
-  const archetype  = profile ? computeArchetype(profile) : null
+  const narrative      = profile ? generateNarrative(profile) : []
+  const synthesis      = profile ? generateSynthesis(profile) : []
+  const contradictions = profile ? generateContradictions(profile) : []
+  const cycleMeta      = computeCycleMeta(cycleHistory, profile)
+  const archetypes         = profile ? computeArchetypes(profile) : []
+  const archetype          = archetypes[0] || null
+  const secondaryArchetype = archetypes[1] || null
 
   useEffect(() => {
     if (!profile) return
@@ -199,6 +317,11 @@ export default function ProfileScreen() {
     const restartTimer = setTimeout(() => setShowRestart(true), narrative.length * 900 + 1400)
     return () => { timers.forEach(clearTimeout); clearTimeout(cardTimer); clearTimeout(restartTimer) }
   }, [profile])
+
+  function revealAll() {
+    setVisibleCount(narrative.length)
+    setAllRevealed(true)
+  }
 
   function handleDescend() {
     setDescending(true)
@@ -272,6 +395,11 @@ export default function ProfileScreen() {
                 <p className="mono font-bold text-xl tracking-widest" style={{ color: 'var(--realm-accent)' }}>
                   {archetype.name.toUpperCase()}
                 </p>
+                {secondaryArchetype && (
+                  <p className="mono text-xs mt-1" style={{ color: 'rgba(var(--realm-accent-rgb), 0.5)' }}>
+                    Secondary: {secondaryArchetype.name}
+                  </p>
+                )}
               </div>
             </div>
             <p className="text-slate-300 text-sm leading-relaxed">{archetype.portrait}</p>
@@ -290,28 +418,58 @@ export default function ProfileScreen() {
 
         {/* Radar */}
         <div className="flex justify-center">
-          <RadarChart profile={profile} size={220} />
+          <RadarChart profile={profile} size={260} />
         </div>
 
-        {/* Narrative — revealed one at a time */}
+        {/* Narrative — revealed one at a time, tappable for source/value detail */}
         <div className="space-y-3">
           {narrative.slice(0, visibleCount).map((item, i) => {
-            const isGlowing = glowIndex === i
+            const isGlowing  = glowIndex === i
+            const isExpanded = expandedCard === i
+            const ac         = NARRATIVE_ACCENTS[item.label]
+            const acRgb      = ac?.rgb    ?? '226,232,240'
+            const acColor    = ac?.accent ?? 'var(--realm-accent)'
+            const dimInfo    = LABEL_TO_DIM[item.label]
+            const dimMeta    = dimInfo ? DIM_LABELS[dimInfo.dim] : null
+            const rawValue   = dimInfo ? profile[dimInfo.dim] : null
+            const readable   = dimMeta && rawValue ? (dimMeta.map[rawValue] || rawValue) : rawValue
             return (
-              <div key={i} className="rounded-2xl p-4 transition-all duration-700"
+              <div key={i}
+                onClick={() => setExpandedCard(isExpanded ? null : i)}
+                className="rounded-2xl p-4 transition-all duration-700 cursor-pointer"
                 style={{
-                  background: isGlowing ? 'rgba(var(--realm-accent-rgb), 0.08)' : 'rgba(255,255,255,0.03)',
-                  border: `1px solid ${isGlowing ? 'rgba(var(--realm-accent-rgb), 0.3)' : 'rgba(255,255,255,0.07)'}`,
-                  boxShadow: isGlowing ? '0 0 20px rgba(var(--realm-accent-rgb), 0.1)' : 'none',
-                  animation: i === visibleCount - 1 ? 'screenFadeIn 0.5s cubic-bezier(0.16,1,0.3,1)' : 'none',
+                  background: isGlowing ? `rgba(${acRgb}, 0.08)` : `rgba(${acRgb}, 0.03)`,
+                  border: `1px solid ${isExpanded ? `rgba(${acRgb}, 0.28)` : isGlowing ? `rgba(${acRgb}, 0.3)` : `rgba(${acRgb}, 0.12)`}`,
+                  boxShadow: isGlowing ? `0 0 20px rgba(${acRgb}, 0.1)` : 'none',
+                  animation: i === visibleCount - 1 && !allRevealed ? 'screenFadeIn 0.5s cubic-bezier(0.16,1,0.3,1)' : 'none',
                 }}>
-                <p className="mono text-xs font-semibold mb-2" style={{ color: 'var(--realm-accent)' }}>
+                <p className="mono text-xs font-semibold mb-2" style={{ color: acColor }}>
                   {item.label.toUpperCase()}
                 </p>
                 <p className="text-slate-300 text-sm leading-relaxed">{item.text}</p>
+                {isExpanded && dimInfo && (
+                  <div className="mt-3 pt-3 flex gap-6" style={{ borderTop: `1px solid rgba(${acRgb}, 0.18)` }}>
+                    <div>
+                      <p className="mono text-xs text-slate-600 mb-0.5">SOURCE</p>
+                      <p className="mono text-xs font-semibold tracking-widest" style={{ color: acColor }}>{dimInfo.realmLabel}</p>
+                    </div>
+                    {readable && (
+                      <div>
+                        <p className="mono text-xs text-slate-600 mb-0.5">RECORDED</p>
+                        <p className="mono text-xs font-semibold tracking-widest" style={{ color: acColor }}>{readable.toUpperCase()}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )
           })}
+          {visibleCount >= 4 && !allRevealed && visibleCount < narrative.length && (
+            <button onClick={revealAll}
+              className="w-full mono text-xs text-slate-600 py-2 underline underline-offset-2">
+              reveal all
+            </button>
+          )}
         </div>
 
         {/* Cross-dimension synthesis */}
@@ -327,12 +485,51 @@ export default function ProfileScreen() {
           </div>
         )}
 
+        {/* Contradictions */}
+        {showCard && contradictions.length > 0 && (
+          <div className="animate-fade-in space-y-3">
+            <p className="mono text-xs text-slate-600 tracking-widest">TENSIONS</p>
+            {contradictions.map((c, i) => (
+              <div key={i} className="rounded-2xl p-4"
+                style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <p className="text-slate-400 text-sm leading-relaxed">{c.text}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Cross-cycle history (cycle 2+) */}
         {showCard && cycleMeta && (
           <div className="animate-fade-in">
             <CycleHistory meta={cycleMeta} cycleHistory={cycleHistory} currentProfile={profile} />
           </div>
         )}
+
+        {/* Stable core (3+ fixed dimensions across cycles) */}
+        {showCard && cycleMeta && (() => {
+          const stable = cycleMeta.filter(m => m.consistent)
+          if (stable.length < 3) return null
+          return (
+            <div className="animate-fade-in rounded-2xl p-5 space-y-3"
+              style={{ background: 'rgba(var(--realm-accent-rgb), 0.05)', border: '1px solid rgba(var(--realm-accent-rgb), 0.2)' }}>
+              <p className="mono text-xs tracking-widest" style={{ color: 'var(--realm-accent)' }}>YOUR FOUNDATION</p>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                These dimensions have not moved across any cycle. They are not traits you perform — they are what you are made of.
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {stable.map(({ dim }) => {
+                  const m = DIM_LABELS[dim]
+                  return (
+                    <span key={dim} className="mono text-xs px-2.5 py-1 rounded-full"
+                      style={{ background: 'rgba(var(--realm-accent-rgb), 0.12)', border: '1px solid rgba(var(--realm-accent-rgb), 0.25)', color: 'var(--realm-accent)' }}>
+                      {m?.label || dim}
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })()}
 
         {/* Final stance */}
         {showCard && (
